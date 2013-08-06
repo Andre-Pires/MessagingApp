@@ -1,6 +1,5 @@
 package hourglass.studios.test;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,10 +21,10 @@ public class MessageReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         int counter;
-        prefs = PreferenceManager.getDefaultSharedPreferences(context); /// ??????????
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Bundle bundle = intent.getExtras();
         String sms = "", phone = "";
-        SmsMessage[] msgs = null;
+        SmsMessage[] msgs;
 
         if (bundle != null){
 

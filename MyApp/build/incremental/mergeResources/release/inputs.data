@@ -1,0 +1,20 @@
+# incremental data. DO NOT EDIT.
+# format is <lastModified> <length> <SHA-1> <path>
+# Encoding is UTF-8
+1250720068000 8139 c32cd938865c6d2c59945972d50f21213a553d3e C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-hdpi\im.png
+1373193596320 2747 9a562e6c25e63419c64e1fdc70109ba08bb0539c C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\message.xml
+1250720068000 8139 c32cd938865c6d2c59945972d50f21213a553d3e C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-xhdpi\im.png
+1372257732354 211 4e1904afba59d31e5cd6133f6a4c360fa9a5913f C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values\dimens.xml
+1373103545722 1327 f5dc88c15ceb5efa8642675db1da474429f841e2 C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\activity_main.xml
+1372257732087 381 b129b276e01126de5b3b753572ac67cbfc19454c C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-v14\styles.xml
+1372257732086 324 aa1f5f1723de9aee2669dc44a26fbc0ce776d35f C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-v11\styles.xml
+1250720068000 8139 c32cd938865c6d2c59945972d50f21213a553d3e C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-xxhdpi\im.png
+1372257732356 181 84de2797380184d8b39af6f829afb092fb956173 C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-sw600dp\dimens.xml
+1372257732077 680 c76f4caaa7a8dfe9727fa93001b3aee3b22d6716 C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values\styles.xml
+1250720068000 8139 c32cd938865c6d2c59945972d50f21213a553d3e C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-mdpi\im.png
+1372257732344 244 045ff451db7cd8e61285502b8c9bbf7405f2078d C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\menu\main.xml
+1372358972324 361 5ced1fd35efe7dbb2ebcf93f0eff263ff1bab664 C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values\strings.xml
+1372327198351 746 245432037b25eb0e91f3e84f7f4fc0fc187f848a C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\settings.xml
+1372327159655 244 045ff451db7cd8e61285502b8c9bbf7405f2078d C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\menu\settings.xml
+1372321285632 9216 b645385ae1cb78cc482658af88906e9cf36e1fcc C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-hdpi\Thumbs.db
+1372257732357 254 25b6404e44acb50c82590049639d4fb5fefbac8e C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-sw720dp-land\dimens.xml

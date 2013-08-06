@@ -52,6 +52,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+                android:name="hourglass.studios.test.Contact_Messages"
+                android:label="Message">
+            <intent-filter>
+                <action android:name="hourglass.studios.test.Message" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <receiver android:name=".MessageReceiver">
             <intent-filter>
