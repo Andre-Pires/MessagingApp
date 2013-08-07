@@ -29,6 +29,11 @@
                 qualifiers=""
                 type="layout" />
             <file
+                name="contact_messages"
+                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\contact_messages.xml"
+                qualifiers=""
+                type="layout" />
+            <file
                 name="message"
                 path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\message.xml"
                 qualifiers=""
@@ -124,11 +129,6 @@
                     <!-- API 14 theme customizations can go here. -->
                 </style>
             </file>
-            <file
-                name="contact_messages"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\contact_messages.xml"
-                qualifiers=""
-                type="layout" />
         </source>
         <source path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\build\res\rs\debug" />
     </dataSet>

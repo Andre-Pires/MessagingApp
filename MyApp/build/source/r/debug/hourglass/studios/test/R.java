@@ -12,7 +12,7 @@ public final class R {
     }
     public static final class dimen {
         /**  From: file:/C:/Users/Pires/AndroidStudioProjects/MyAppProject/MyApp/src/main/res/values/dimens.xml 
- From: C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-sw720dp-land\dimens.xml 
+ From: file:/C:/Users/Pires/AndroidStudioProjects/MyAppProject/MyApp/src/main/res/values-sw720dp-land/dimens.xml 
          */
         public static final int activity_horizontal_margin=0x7f040000;
         public static final int activity_vertical_margin=0x7f040001;
@@ -57,9 +57,9 @@ public final class R {
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         
- From: C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-v11\styles.xml 
+ From: file:/C:/Users/Pires/AndroidStudioProjects/MyAppProject/MyApp/src/main/res/values-v11/styles.xml 
  API 11 theme customizations can go here. 
- From: C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-v14\styles.xml 
+ From: file:/C:/Users/Pires/AndroidStudioProjects/MyAppProject/MyApp/src/main/res/values-v14/styles.xml 
  API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f060000;

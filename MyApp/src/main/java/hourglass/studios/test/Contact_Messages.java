@@ -61,35 +61,15 @@ public class Contact_Messages extends ListActivity{
             thread = extras.getString("thread");
         }
 
+        contact = (TextView) findViewById(R.id.textCont);
+        buttonsend = (Button) findViewById(R.id.btsend);
+        sms_rc = (EditText) findViewById(R.id.textsms);
+
+
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listItems);
         setListAdapter(adapter);
 
 
-        //-------------contact's sms list-----------------
-        String strUriCon = "content://sms/conversations/" + thread;
-        Uri uriSmsConversations = Uri.parse(strUriCon);
-        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null,"date");
-
-
-        if(c.moveToFirst()){
-            while(c.moveToNext())
-            {
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                String number =c.getString(c.getColumnIndexOrThrow("address"));
-
-                if(c.getInt(c.getColumnIndexOrThrow("address")) != 1)
-                listItems.add(number + "\n" + body);
-
-                else listItems.add("Me" + "\n" + body);
-            }
-        }
-        c.close();
-
-        adapter.notifyDataSetChanged();
-
-        contact = (TextView) findViewById(R.id.textCont);
-        buttonsend = (Button) findViewById(R.id.btsend);
-        sms_rc = (EditText) findViewById(R.id.textsms);
 
         // ver se não é possivel fazer merge com o código de cima
 
@@ -97,14 +77,12 @@ public class Contact_Messages extends ListActivity{
         String where = "thread_id="+thread;
         Cursor mycursor= getContentResolver().query(uri, null, where ,null,null);
 
-
-
+        //-----contact's name ------------------
         if(mycursor.moveToFirst())
-             phone=mycursor.getString(mycursor.getColumnIndexOrThrow("address"));
+            phone=mycursor.getString(mycursor.getColumnIndexOrThrow("address"));
 
         mycursor.close();
 
-        // arranjar para suportar varios numeros
         if(!(phone.equals(""))){
 
             //contact's number
@@ -122,6 +100,34 @@ public class Contact_Messages extends ListActivity{
             contact.setText( name + " - " + phone);
 
         else contact.setText(phone);
+
+
+
+        //-------------contact's sms list-----------------
+        String strUriCon = "content://sms/conversations/" + thread;
+        Uri uriSmsConversations = Uri.parse(strUriCon);
+        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null,"date");
+
+
+        if(c.moveToFirst())
+        {
+            while(c.moveToNext())
+            {
+                String body = c.getString(c.getColumnIndexOrThrow("body"));
+                String number = c.getString(c.getColumnIndexOrThrow("address"));
+
+                if(c.getInt(c.getColumnIndexOrThrow("type")) == 1)                       // descobrir o que é q os numeros do type significam mesmo
+                    listItems.add(name + "\n" + body);
+
+                else if(c.getInt(c.getColumnIndexOrThrow("type")) == 2)
+                    listItems.add("Me" + "\n" + body);
+
+                else listItems.add(number + "\n" + body);
+            }
+        }
+        c.close();
+
+        adapter.notifyDataSetChanged();
     }
 
 
