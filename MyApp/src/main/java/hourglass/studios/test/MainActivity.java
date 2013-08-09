@@ -69,45 +69,44 @@ public class MainActivity extends ListActivity {
     Uri uriSmsConversations = Uri.parse(strUriCon);
     Cursor c = getContentResolver().query(uriSmsConversations, null, null, null,"date");
 
-        while (c.moveToNext())
+
+        for(int counter = c.getCount() -1; counter >= 0 ; counter--)
         {
-                String smsBody = c.getString(c.getColumnIndex("snippet"));
-                String thread = c.getString(c.getColumnIndex("thread_id"));
-                String number = "";
+            c.moveToPosition(counter);
+
+            String smsBody = c.getString(c.getColumnIndex("snippet"));
+            String thread = c.getString(c.getColumnIndex("thread_id"));
+            String number = "";
+
+            listThread.add(thread);
+
+            Uri uri = Uri.parse("content://sms/inbox");
+            String where = "thread_id="+thread;
+            Cursor mycursor= getContentResolver().query(uri, null, where ,null,null);
 
 
-                listThread.add(thread);
 
-                Uri uri = Uri.parse("content://sms/inbox");
-                String where = "thread_id="+thread;
-                Cursor mycursor= getContentResolver().query(uri, null, where ,null,null);
+            if(mycursor.moveToFirst())
+                    number=mycursor.getString(mycursor.getColumnIndexOrThrow("address"));
 
+            mycursor.close();
 
+            // arranjar para suportar varios numeros
+            if(!(number.equals(""))){
 
-                if(mycursor.moveToFirst())
-                        number=mycursor.getString(mycursor.getColumnIndexOrThrow("address"));
+                //contact's number
+                Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+                Cursor cs= getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER+"='"+number+"'",null,null);
 
-                mycursor.close();
-
-                // arranjar para suportar varios numeros
-                if(!(number.equals(""))){
-
-                    //contact's number
-                    Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-                    Cursor cs= getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER+"='"+number+"'",null,null);
-
-                    if(cs.getCount()>0)
-                    {
-                        cs.moveToFirst();
-                        number = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                    }
+                if(cs.getCount()>0)
+                {
+                    cs.moveToFirst();
+                    number = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                 }
-
-
-               listItems.add(number + "\n\n" + smsBody);
             }
-
-        adapter.notifyDataSetChanged();
+            listItems.add(number + "\n\n" + smsBody);
+        }
+    adapter.notifyDataSetChanged();
 }
 
 

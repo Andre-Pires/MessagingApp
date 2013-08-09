@@ -70,9 +70,6 @@ public class Contact_Messages extends ListActivity{
         setListAdapter(adapter);
 
 
-
-        // ver se não é possivel fazer merge com o código de cima
-
         Uri uri = Uri.parse("content://sms/inbox");
         String where = "thread_id="+thread;
         Cursor mycursor= getContentResolver().query(uri, null, where ,null,null);
@@ -109,22 +106,23 @@ public class Contact_Messages extends ListActivity{
         Cursor c = getContentResolver().query(uriSmsConversations, null, null, null,"date");
 
 
-        if(c.moveToFirst())
+        while(c.moveToNext())
         {
-            while(c.moveToNext())
-            {
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                String number = c.getString(c.getColumnIndexOrThrow("address"));
+            String body = c.getString(c.getColumnIndexOrThrow("body"));
+            String number = c.getString(c.getColumnIndexOrThrow("address"));
 
-                if(c.getInt(c.getColumnIndexOrThrow("type")) == 1)                       // descobrir o que é q os numeros do type significam mesmo
-                    listItems.add(name + "\n" + body);
+            if(c.getInt(c.getColumnIndexOrThrow("type")) == 1)                       // type ALL - 0,DRAFTS - 3,INBOX - 1,OUTBOX - 4, SENT - 2
+            {    if(!(name == null) && !name.equals(""))
+                     listItems.add(name + "\n\n" + body);
 
-                else if(c.getInt(c.getColumnIndexOrThrow("type")) == 2)
-                    listItems.add("Me" + "\n" + body);
+                 else listItems.add(number + "\n\n" + body);
 
-                else listItems.add(number + "\n" + body);
-            }
+            }else if(c.getInt(c.getColumnIndexOrThrow("type")) == 2)
+                listItems.add("Me" + "\n\n" + body);
+
+            else listItems.add(number + "\n\n" + body);
         }
+
         c.close();
 
         adapter.notifyDataSetChanged();

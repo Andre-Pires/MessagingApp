@@ -70,9 +70,9 @@
                 </string>
                 <string name="on" >ON!
                 </string>
-                <string name="off" >OFF!
-                </string>
                 <string name="app_name" >MyApp
+                </string>
+                <string name="off" >OFF!
                 </string>
                 <string name="hello_world" >Hello world!
                 </string>
