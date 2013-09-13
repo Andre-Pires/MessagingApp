@@ -1,4 +1,4 @@
 MessagingApp
 ============
 
-Sms aplication for Android
+Sms application for Android
