@@ -32,23 +32,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="368ec840-745f-403e-a181-b1331d5c9298" name="Default" comment="Code cleanup and refactoring.&#10;Added limit to sms list to eliminate lag.&#10;">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/MessagingApp.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/build/source/buildConfig/debug/hourglass/studios/test/BuildConfig.java" afterPath="$PROJECT_DIR$/MyApp/build/source/buildConfig/debug/hourglass/studios/test/BuildConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/src/main/java/hourglass/studios/test/Contact_Messages.java" afterPath="$PROJECT_DIR$/MyApp/src/main/java/hourglass/studios/test/Contact_Messages.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/src/main/java/hourglass/studios/test/MainActivity.java" afterPath="$PROJECT_DIR$/MyApp/src/main/java/hourglass/studios/test/MainActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/src/main/java/hourglass/studios/test/Message.java" afterPath="$PROJECT_DIR$/MyApp/src/main/java/hourglass/studios/test/Message.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/MyApp.iml" afterPath="$PROJECT_DIR$/MyApp/MyApp.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyAppProject.iml" afterPath="$PROJECT_DIR$/MyAppProject.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/build/source/r/debug/hourglass/studios/test/R.java" afterPath="$PROJECT_DIR$/MyApp/build/source/r/debug/hourglass/studios/test/R.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/src/main/res/layout/activity_main.xml" afterPath="$PROJECT_DIR$/MyApp/src/main/res/layout/activity_main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyApp/build.gradle" afterPath="$PROJECT_DIR$/MyApp/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" afterPath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="MyApp.iws" />
@@ -1352,7 +1335,11 @@
       <created>1373140902767</created>
       <updated>1373140902767</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Code cleanup and refactoring.&#10;Added limit to sms list to eliminate lag.&#10;">
+      <created>1397998824785</created>
+      <updated>1397998824785</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -1387,12 +1374,12 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32874355" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32874355" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.47160068" sideWeight="0.42857143" order="4" side_tool="true" content_ui="tabs" x="350" y="287" width="659" height="147" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31153184" sideWeight="0.33282673" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27538726" sideWeight="0.39969605" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19318181" sideWeight="0.22758621" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.2724138" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27538726" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27538726" sideWeight="0.60030395" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6437177" sideWeight="0.5714286" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928678" sideWeight="0.72931033" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32874355" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
