@@ -1,46 +1,35 @@
 package hourglass.studios.test;
 
 import android.app.ListActivity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import static hourglass.studios.test.R.layout.activity_main;
-import static hourglass.studios.test.R.layout.contact_messages;
 
 public class MainActivity extends ListActivity {
 
-    // para controlar a lista
-    int counter, max;
-    Class txtmessage, contact_messages;
-    Button buttonsms;
-    Intent startSettings, sms, contact_sms;
+    private Class txtmessage, contact_messages;
+    private Intent startSettings, sms, contact_sms;
 
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    ArrayList<String> listItems=new ArrayList<String>();
+    private ArrayList<String> listItems = new ArrayList<String>();
 
     //DEFINING STRING ADAPTER WHICH WILL HANDLE DATA OF LISTVIEW
-    ArrayAdapter<String> adapter;
+    private ArrayAdapter<String> adapter;
 
     //LIST OF ARRAY STRINGS WITH THREAD NUMBER
-    ArrayList<String> listThread=new ArrayList<String>();
+    private ArrayList<String> listThread = new ArrayList<String>();
 
 
     @Override
@@ -49,129 +38,78 @@ public class MainActivity extends ListActivity {
 
         setContentView(activity_main);
 
-        buttonsms = (Button) findViewById(R.id.btsms);
-
         createConversations();
-
-
-
     }
 
-    private void createConversations()
-    {
+    private void createConversations() {
 
-    adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listItems);
-    setListAdapter(adapter);
-
-    //-------------teste -----------------
-
-    String strUriCon = "content://sms/conversations";
-    Uri uriSmsConversations = Uri.parse(strUriCon);
-    Cursor c = getContentResolver().query(uriSmsConversations, null, null, null,"date");
-
-
-        for(int counter = c.getCount() -1; counter >= 0 ; counter--)
-        {
-            c.moveToPosition(counter);
-
-            String smsBody = c.getString(c.getColumnIndex("snippet"));
-            String thread = c.getString(c.getColumnIndex("thread_id"));
-            String number = "";
-
-            listThread.add(thread);
-
-            Uri uri = Uri.parse("content://sms/inbox");
-            String where = "thread_id="+thread;
-            Cursor mycursor= getContentResolver().query(uri, null, where ,null,null);
-
-
-
-            if(mycursor.moveToFirst())
-                    number=mycursor.getString(mycursor.getColumnIndexOrThrow("address"));
-
-            mycursor.close();
-
-            // arranjar para suportar varios numeros
-            if(!(number.equals(""))){
-
-                //contact's number
-                Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-                Cursor cs= getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER+"='"+number+"'",null,null);
-
-                if(cs.getCount()>0)
-                {
-                    cs.moveToFirst();
-                    number = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                }
-            }
-            listItems.add(number + "\n\n" + smsBody);
-        }
-    adapter.notifyDataSetChanged();
-}
-
-
-// Obsolete -- To be deleted
-
-/*
-    private void createConversations()
-    {
-
-        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listItems);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
         setListAdapter(adapter);
 
-        //-------------teste -----------------
 
-        Uri uri = Uri.parse("content://sms/inbox");
-        Cursor c= getContentResolver().query(uri, null, null, null, null);
+        String strUriCon = "content://sms/conversations";
+        Uri uriSmsConversations = Uri.parse(strUriCon);
+        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null, "date");
 
 
+        if (c != null && c.getCount() > 0) {
+            c.moveToLast();
+            do {
 
-        if (max  == 0){
+                String smsBody = c.getString(c.getColumnIndex("snippet"));
+                String thread = c.getString(c.getColumnIndex("thread_id"));
+                String number = "";
+                String name = "";
 
-            max = 60;
-        }
-        // To show only the last 60 messages
+                listThread.add(thread);
 
-        counter = 0;
+                Uri uri = Uri.parse("content://sms/inbox");
+                String where = "thread_id=" + thread;
+                Cursor myCursor = getContentResolver().query(uri, null, where, null, null);
 
-        if(c.move(max))
-        {
-            listItems.add("Press to show more messages.");
 
-            counter++;
+                final boolean canMoveToFirst = myCursor != null && myCursor.moveToFirst();
 
-           while(c.moveToPrevious())
-           {
-               if(counter > max)
-                   break;
+                if (canMoveToFirst) {
+                    number = myCursor.getString(myCursor.getColumnIndexOrThrow("address"));
+                    myCursor.close();
+                } else
+                    name = "Failed to retrieve name.";
 
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                String number =c.getString(c.getColumnIndexOrThrow("address"));
 
-               //contact's number
-               Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-               Cursor cs= getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER+"='"+number+"'",null,null);
+                // arranjar para suportar varios numeros
+                final boolean stringEmpty = number != null && number.equals("");
 
-               if(cs.getCount()>0)
-               {
-                   cs.moveToFirst();
-                   number = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-               }
+                if (!stringEmpty) {
 
-               listItems.add(number + "\n\n" + body);
+                    //contact's number
+                    Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 
-               counter++;
-            }
+                    if (uri_cont != null) {
+                        Cursor cs = getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + number + "'", null, null);
+
+                        if (cs != null && cs.getCount() > 0) {
+                            cs.moveToFirst();
+                            name = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                            cs.close();
+                        } else
+                            name = number;
+                    } else
+                        name = number;
+
+                }
+
+                listItems.add(name + "\n\n" + smsBody);
+            }  while (c.moveToPrevious());
+
             c.close();
-
         }
 
         adapter.notifyDataSetChanged();
     }
-*/
+
 
     public void buttonSmsOnClick(View v) {
-
 
 
         try {
@@ -197,7 +135,7 @@ public class MainActivity extends ListActivity {
         }
 
         contact_sms = new Intent(MainActivity.this, contact_messages);
-        contact_sms.putExtra("thread",listThread.get(position));
+        contact_sms.putExtra("thread", listThread.get(position));
         startActivity(contact_sms);
 
     }
@@ -214,7 +152,7 @@ public class MainActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startSettings = new Intent("hourglass.studios.test.SETTINGS");
-                startActivity( startSettings);
+                startActivity(startSettings);
         }
 
         return true;

@@ -3,9 +3,15 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="C:\Users\Pires\AndroidStudioProjects\MyAppProject" />
-        <option name="gradleHome" value="C:\Users\Pires\.gradle\wrapper\dists\gradle-1.6-bin\72srdo3a5eb3bic159kar72vok\gradle-1.6" />
-        <option name="useAutoImport" value="true" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../Pires/.gradle/wrapper/dists/gradle-1.6-bin/72srdo3a5eb3bic159kar72vok/gradle-1.6" />
+        <option name="modules">
+          <set>
+            <option value="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp" />
+            <option value="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>

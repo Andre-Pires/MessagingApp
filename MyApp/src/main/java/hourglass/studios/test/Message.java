@@ -1,7 +1,6 @@
 package hourglass.studios.test;
 
 
-
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.PendingIntent;
@@ -10,49 +9,30 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 
 /**
  * Created by Pires on 6/29/13.
  */
 public class Message extends ListActivity{
 
-    SharedPreferences prefs;
-    Button buttonsend;
-    EditText phone_rc, sms_rc;
-    String phone_sd, sms_sd;
-
-    //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    ArrayList<String> listItems=new ArrayList<String>();
-
-    //DEFINING STRING ADAPTER WHICH WILL HANDLE DATA OF LISTVIEW
-    ArrayAdapter<String> adapter;
-
-    //Contact Sms List
+    //Contact List
     ArrayList<String> contacts=new ArrayList<String>();
+    private EditText phone_rc, sms_rc;
+    private String phone_sd, sms_sd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,36 +40,12 @@ public class Message extends ListActivity{
 
         setContentView(R.layout.message);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listItems);
-        setListAdapter(adapter);
-
-        //-------------lista de sms do meu numero-----------------
-        Uri uri = Uri.parse("content://sms/");
-        Cursor c= getContentResolver().query(uri, null, null, null, null);
-
-
-
-        if(c.moveToLast()){
-            while(c.moveToPrevious())
-            {
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                //String number =c.getString(c.getColumnIndexOrThrow("address"));
-                listItems.add(body);
-            }
-        }
-        c.close();
-
-        adapter.notifyDataSetChanged();
-
         initializeList();
 
-        buttonsend = (Button) findViewById(R.id.btsend);
         phone_rc = (EditText) findViewById(R.id.textphone);
         sms_rc = (EditText) findViewById(R.id.textsms);
 
-
+        autoCompleteCleaner();
 
     }
 
@@ -100,8 +56,7 @@ public class Message extends ListActivity{
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
 
-
-        if (cur.getCount() > 0) {
+        if (cur.getCount() > 0)
             while (cur.moveToNext()) {
 
                 String id = cur.getString(
@@ -119,17 +74,18 @@ public class Message extends ListActivity{
                                 new String[]{id}, null);
 
 
+                        while (pCur.moveToNext()) {
+                            String number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            final String deviceType = cellType(pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
+                            number = number.replaceAll("-", "");
 
-                        while (pCur.moveToNext())
-                              contacts.add(name + " : " +  pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)) + " \n " +
-                                      cellType(pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))));
-
+                            contacts.add(name + " : " + number + " \n " + deviceType);
+                        }
                         pCur.close();
                     }
             }
+        cur.close();
 
-
-        }
 
         //eliminating duplicates and sort list
         HashSet hs = new HashSet();
@@ -139,9 +95,9 @@ public class Message extends ListActivity{
         contacts.addAll(hs);
 
         Collections.sort(contacts);
+    }
 
-        //---------------------Devia estar no topo---------------------------
-
+    private void autoCompleteCleaner() {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, contacts);
         final AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.textphone);
         textView.setAdapter(adapter);
@@ -153,16 +109,12 @@ public class Message extends ListActivity{
             @Override
             public void onItemClick(AdapterView<?> av, View arg1, int index, long arg3) {
 
-           String cenas = (String) av.getItemAtPosition(index);
-               cenas =  cenas.replaceAll("( \n [a-zA-Z]*)", "");
-               textView.setText(cenas);
+                String number = (String) av.getItemAtPosition(index);
+                number = number.replaceAll("( \n [a-zA-Z]*)", "");
+                textView.setText(number);
 
             }
-
-
-
         });
-
     }
 
 
@@ -223,10 +175,10 @@ public class Message extends ListActivity{
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
 
-        PendingIntent sentsms = PendingIntent.getBroadcast(this, 0,
+        PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
 
-        PendingIntent deliveredsms = PendingIntent.getBroadcast(this, 0,
+        PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
 
         //---when the SMS has been sent---
@@ -278,17 +230,15 @@ public class Message extends ListActivity{
         }, new IntentFilter(DELIVERED));
 
 
-        SmsManager smsman = SmsManager.getDefault();
+        SmsManager smsMan = SmsManager.getDefault();
 
 
 
         try{
-            smsman.sendTextMessage(phone_sd,null, sms_sd, sentsms, deliveredsms);
+            smsMan.sendTextMessage(phone_sd, null, sms_sd, sentSms, deliveredSms);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-       adapter.notifyDataSetChanged();
 
         finish();
 
