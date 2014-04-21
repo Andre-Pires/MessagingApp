@@ -1,6 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="hourglass.studios.test">
+<!-- From: file:/C:/Users/A.%20Pires/Documents/AndroidStudio/MessagingApp/MyApp/src/main/AndroidManifest.xml --><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="hourglass.studios.test">
 
-    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="16"/>
+    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
 
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>

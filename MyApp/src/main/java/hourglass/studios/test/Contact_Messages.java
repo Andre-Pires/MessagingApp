@@ -28,7 +28,8 @@ import java.util.ArrayList;
 public class Contact_Messages extends ListActivity{
 
     private int maxListSize = 50;
-    private String thread, phone, name = "";
+    private String thread, phone = "";
+    private String name = "";
     private EditText sms_rc;
     private TextView contact;
     private String sms_sd;
@@ -58,18 +59,23 @@ public class Contact_Messages extends ListActivity{
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listItems);
         setListAdapter(adapter);
 
-
-        Uri uri = Uri.parse("content://sms/inbox");
-        String where = "thread_id="+thread;
-        Cursor myCursor = getContentResolver().query(uri, null, where, null, null);
-
-        //-----contact's name ------------------
-        if (myCursor != null && myCursor.moveToFirst()) {
-            phone = myCursor.getString(myCursor.getColumnIndexOrThrow("address"));
-            myCursor.close();
+        if (phone.equals("")){
+            phone = getPhoneNumber("content://sms/inbox");
+        }
+        if (phone.equals("")){
+            phone = getPhoneNumber("content://sms/sent");
+        }
+        if (phone.equals("")){
+            phone = getPhoneNumber("content://sms/drafts");
+        }
+        if (phone.equals("")){
+            phone = getPhoneNumber("content://sms/outbox");
+        }
+        if (phone.equals("")){
+            phone = getPhoneNumber("content://sms/failed");
         }
 
-        if (phone != null && !(phone.equals(""))) {
+        if (!(phone.equals(""))) {
 
             //contact's number
             Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phone));
@@ -91,7 +97,6 @@ public class Contact_Messages extends ListActivity{
         } else
             contact.setText("Failed to retrieve name");
 
-
         //-------------contact's sms list-----------------
         populateSmsList();
     }
@@ -103,7 +108,8 @@ public class Contact_Messages extends ListActivity{
 
         if (c != null) {
 
-            listItems.add("Press to show more entries");
+            if (c.getCount() > maxListSize)
+                listItems.add("Press to show more entries");
 
             c.moveToPosition(c.getCount() - maxListSize);
 
@@ -128,6 +134,19 @@ public class Contact_Messages extends ListActivity{
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    private String getPhoneNumber(String uriString){
+        Uri uri = Uri.parse(uriString);
+        String where = "thread_id="+thread;
+        Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
+        String phone = "";
+
+        if (cursorPhone != null && cursorPhone.moveToFirst()) {
+            phone = cursorPhone.getString(cursorPhone.getColumnIndexOrThrow("address"));
+            cursorPhone.close();
+        }
+        return phone;
     }
 
 

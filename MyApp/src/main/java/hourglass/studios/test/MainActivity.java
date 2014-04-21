@@ -73,9 +73,25 @@ public class MainActivity extends ListActivity {
                 if (canMoveToFirst) {
                     number = myCursor.getString(myCursor.getColumnIndexOrThrow("address"));
                     myCursor.close();
-                } else
-                    name = "Failed to retrieve name.";
+                } else {
 
+                    // To check for name/number in any sms type
+                    if (number.equals("")) {
+                        number = getPhoneNumber("content://sms/inbox", thread);
+                    }
+                    if (number.equals("")) {
+                        number = getPhoneNumber("content://sms/sent", thread);
+                    }
+                    if (number.equals("")) {
+                        number = getPhoneNumber("content://sms/drafts", thread);
+                    }
+                    if (number.equals("")) {
+                        number = getPhoneNumber("content://sms/outbox", thread);
+                    }
+                    if (number.equals("")) {
+                        number = getPhoneNumber("content://sms/failed", thread);
+                    }
+                }
 
                 // arranjar para suportar varios numeros
                 final boolean stringEmpty = number != null && number.equals("");
@@ -106,6 +122,19 @@ public class MainActivity extends ListActivity {
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    private String getPhoneNumber(String uriString, String thread){
+        Uri uri = Uri.parse(uriString);
+        String where = "thread_id="+thread;
+        Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
+        String phone = "";
+
+        if (cursorPhone != null && cursorPhone.moveToFirst()) {
+            phone = cursorPhone.getString(cursorPhone.getColumnIndexOrThrow("address"));
+            cursorPhone.close();
+        }
+        return phone;
     }
 
 

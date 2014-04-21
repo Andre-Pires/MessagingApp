@@ -2,59 +2,59 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res" >
+        <source path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res" >
             <file
                 name="im"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-hdpi\im.png"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\drawable-hdpi\im.png"
                 qualifiers="hdpi"
                 type="drawable" />
             <file
                 name="im"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-mdpi\im.png"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\drawable-mdpi\im.png"
                 qualifiers="mdpi"
                 type="drawable" />
             <file
                 name="im"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-xhdpi\im.png"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\drawable-xhdpi\im.png"
                 qualifiers="xhdpi"
                 type="drawable" />
             <file
                 name="im"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\drawable-xxhdpi\im.png"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\drawable-xxhdpi\im.png"
                 qualifiers="xxhdpi"
                 type="drawable" />
             <file
                 name="activity_main"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\activity_main.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\layout\activity_main.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="contact_messages"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\contact_messages.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\layout\contact_messages.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="message"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\message.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\layout\message.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="settings"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\layout\settings.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\layout\settings.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="main"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\menu\main.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\menu\main.xml"
                 qualifiers=""
                 type="menu" />
             <file
                 name="settings"
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\menu\settings.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\menu\settings.xml"
                 qualifiers=""
                 type="menu" />
             <file
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values\dimens.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\values\dimens.xml"
                 qualifiers="" >
                 <dimen name="activity_horizontal_margin" >16dp
                 </dimen>
@@ -62,7 +62,7 @@
                 </dimen>
             </file>
             <file
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values\strings.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\values\strings.xml"
                 qualifiers="" >
                 <string name="title_activity_settings" >Settings
                 </string>
@@ -70,9 +70,9 @@
                 </string>
                 <string name="on" >ON!
                 </string>
-                <string name="app_name" >MyApp
-                </string>
                 <string name="off" >OFF!
+                </string>
+                <string name="app_name" >MyApp
                 </string>
                 <string name="hello_world" >Hello world!
                 </string>
@@ -80,7 +80,7 @@
                 </string>
             </file>
             <file
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values\styles.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\values\styles.xml"
                 qualifiers="" >
 
                 <style
@@ -102,13 +102,13 @@
                 </style>
             </file>
             <file
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-sw720dp-land\dimens.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\values-sw720dp-land\dimens.xml"
                 qualifiers="sw720dp-land" >
                 <dimen name="activity_horizontal_margin" >128dp
                 </dimen>
             </file>
             <file
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-v11\styles.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\values-v11\styles.xml"
                 qualifiers="v11" >
 
                 <style
@@ -119,7 +119,7 @@
                 </style>
             </file>
             <file
-                path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\main\res\values-v14\styles.xml"
+                path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\main\res\values-v14\styles.xml"
                 qualifiers="v14" >
 
                 <style
@@ -130,10 +130,11 @@
                 </style>
             </file>
         </source>
-        <source path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\build\res\rs\debug" />
+        <source path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\build\res\rs\debug" />
+        <source path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\build\res\generated\debug" />
     </dataSet>
     <dataSet config="debug" >
-        <source path="C:\Users\Pires\AndroidStudioProjects\MyAppProject\MyApp\src\debug\res" />
+        <source path="C:\Users\A. Pires\Documents\AndroidStudio\MessagingApp\MyApp\src\debug\res" />
     </dataSet>
 
 </merger>
