@@ -27,10 +27,10 @@ import java.util.HashSet;
 /**
  * Created by Pires on 6/29/13.
  */
-public class Message extends ListActivity{
+public class Message extends ListActivity {
 
     //Contact List
-    ArrayList<String> contacts=new ArrayList<String>();
+    ArrayList<String> contacts = new ArrayList<String>();
     private EditText phone_rc, sms_rc;
     private String phone_sd, sms_sd;
 
@@ -49,7 +49,7 @@ public class Message extends ListActivity{
 
     }
 
-    public void initializeList(){
+    public void initializeList() {
 
 
         ContentResolver cr = getContentResolver();
@@ -64,25 +64,25 @@ public class Message extends ListActivity{
                 String name = cur.getString(
                         cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
-                    if (Integer.parseInt(cur.getString(
-                            cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                if (Integer.parseInt(cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
 
-                        Cursor pCur = cr.query(
-                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                null,
-                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                                new String[]{id}, null);
+                    Cursor pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            new String[]{id}, null);
 
 
-                        while (pCur.moveToNext()) {
-                            String number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            final String deviceType = cellType(pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
-                            number = number.replaceAll("-", "");
+                    while (pCur.moveToNext()) {
+                        String number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        final String deviceType = cellType(pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
+                        number = number.replaceAll("-", "");
 
-                            contacts.add(name + " : " + number + " \n " + deviceType);
-                        }
-                        pCur.close();
+                        contacts.add(name + " : " + number + " \n " + deviceType);
                     }
+                    pCur.close();
+                }
             }
         cur.close();
 
@@ -118,7 +118,7 @@ public class Message extends ListActivity{
     }
 
 
-    public String cellType(int type){
+    public String cellType(int type) {
 
 
         String stringType = "";
@@ -169,7 +169,7 @@ public class Message extends ListActivity{
 
     }
 
-    public void sendMessage(){
+    public void sendMessage() {
 
 
         String SENT = "SMS_SENT";
@@ -182,11 +182,10 @@ public class Message extends ListActivity{
                 new Intent(DELIVERED), 0);
 
         //---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "SMS sent",
                                 Toast.LENGTH_SHORT).show();
@@ -212,11 +211,10 @@ public class Message extends ListActivity{
         }, new IntentFilter(SENT));
 
         //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "SMS delivered",
                                 Toast.LENGTH_SHORT).show();
@@ -233,10 +231,9 @@ public class Message extends ListActivity{
         SmsManager smsMan = SmsManager.getDefault();
 
 
-
-        try{
+        try {
             smsMan.sendTextMessage(phone_sd, null, sms_sd, sentSms, deliveredSms);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

@@ -26,17 +26,17 @@ public class MessageReceiver extends BroadcastReceiver {
         String sms = "", phone = "";
         SmsMessage[] msgs;
 
-        if (bundle != null){
+        if (bundle != null) {
 
             Object[] pdus = (Object[]) bundle.get("pdus");
             msgs = new SmsMessage[pdus.length];
-            for (int i=0; i<msgs.length; i++){
+            for (int i = 0; i < msgs.length; i++) {
                 msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                 phone += msgs[i].getOriginatingAddress();
                 sms += msgs[i].getMessageBody();
             }
 
-            Toast.makeText(context,"-->" + sms,Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "You have a new message from " + phone + " .", Toast.LENGTH_SHORT).show();
 
 
             counter = prefs.getInt("counter", 0);
@@ -44,7 +44,7 @@ public class MessageReceiver extends BroadcastReceiver {
             SharedPreferences.Editor prefEditor = prefs.edit();
 
 
-            prefEditor.putString("message_"+counter, sms);
+            prefEditor.putString("message_" + counter, sms);
 
             ++counter;
             prefEditor.putInt("counter", counter);

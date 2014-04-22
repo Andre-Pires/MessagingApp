@@ -48,16 +48,16 @@ public class MainActivity extends ListActivity {
 
 
         String strUriCon = "content://sms/conversations";
-        Uri uriSmsConversations = Uri.parse(strUriCon);
-        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null, "date");
+        Uri uriSmsThreads = Uri.parse(strUriCon);
+        Cursor threadCursor = getContentResolver().query(uriSmsThreads, null, null, null, "date");
 
 
-        if (c != null && c.getCount() > 0) {
-            c.moveToLast();
+        if (threadCursor != null && threadCursor.getCount() > 0) {
+            threadCursor.moveToLast();
             do {
 
-                String smsBody = c.getString(c.getColumnIndex("snippet"));
-                String thread = c.getString(c.getColumnIndex("thread_id"));
+                String smsBody = threadCursor.getString(threadCursor.getColumnIndexOrThrow("snippet"));
+                String thread = threadCursor.getString(threadCursor.getColumnIndexOrThrow("thread_id"));
                 String number = "";
                 String name = "";
 
@@ -65,20 +65,15 @@ public class MainActivity extends ListActivity {
 
                 Uri uri = Uri.parse("content://sms/inbox");
                 String where = "thread_id=" + thread;
-                Cursor myCursor = getContentResolver().query(uri, null, where, null, null);
+                Cursor contactCursor = getContentResolver().query(uri, null, where, null, null);
+                number = contactCursor.getString(contactCursor.getColumnIndexOrThrow("address"));
 
-
-                final boolean canMoveToFirst = myCursor != null && myCursor.moveToFirst();
-
-                if (canMoveToFirst) {
-                    number = myCursor.getString(myCursor.getColumnIndexOrThrow("address"));
-                    myCursor.close();
-                } else {
+                if (contactCursor.moveToFirst()) {
+                    number = contactCursor.getString(contactCursor.getColumnIndexOrThrow("address"));
+                    contactCursor.close();
+                } else if (number != null){
 
                     // To check for name/number in any sms type
-                    if (number.equals("")) {
-                        number = getPhoneNumber("content://sms/inbox", thread);
-                    }
                     if (number.equals("")) {
                         number = getPhoneNumber("content://sms/sent", thread);
                     }
@@ -104,8 +99,7 @@ public class MainActivity extends ListActivity {
                     if (uri_cont != null) {
                         Cursor cs = getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + number + "'", null, null);
 
-                        if (cs != null && cs.getCount() > 0) {
-                            cs.moveToFirst();
+                        if (cs != null && cs.moveToFirst()) {
                             name = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                             cs.close();
                         } else
@@ -116,17 +110,17 @@ public class MainActivity extends ListActivity {
                 }
 
                 listItems.add(name + "\n\n" + smsBody);
-            }  while (c.moveToPrevious());
+            } while (threadCursor.moveToPrevious());
 
-            c.close();
+            threadCursor.close();
         }
 
         adapter.notifyDataSetChanged();
     }
 
-    private String getPhoneNumber(String uriString, String thread){
+    private String getPhoneNumber(String uriString, String thread) {
         Uri uri = Uri.parse(uriString);
-        String where = "thread_id="+thread;
+        String where = "thread_id=" + thread;
         Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
         String phone = "";
 

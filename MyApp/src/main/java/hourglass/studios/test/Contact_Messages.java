@@ -25,7 +25,7 @@ import java.util.ArrayList;
 /**
  * Created by Pires on 6/29/13.
  */
-public class Contact_Messages extends ListActivity{
+public class Contact_Messages extends ListActivity {
 
     private int maxListSize = 50;
     private String thread, phone = "";
@@ -56,22 +56,22 @@ public class Contact_Messages extends ListActivity{
         sms_rc = (EditText) findViewById(R.id.textsms);
 
 
-        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listItems);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
         setListAdapter(adapter);
 
-        if (phone.equals("")){
+        if (phone.equals("")) {
             phone = getPhoneNumber("content://sms/inbox");
         }
-        if (phone.equals("")){
+        if (phone.equals("")) {
             phone = getPhoneNumber("content://sms/sent");
         }
-        if (phone.equals("")){
+        if (phone.equals("")) {
             phone = getPhoneNumber("content://sms/drafts");
         }
-        if (phone.equals("")){
+        if (phone.equals("")) {
             phone = getPhoneNumber("content://sms/outbox");
         }
-        if (phone.equals("")){
+        if (phone.equals("")) {
             phone = getPhoneNumber("content://sms/failed");
         }
 
@@ -79,12 +79,11 @@ public class Contact_Messages extends ListActivity{
 
             //contact's number
             Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phone));
-            Cursor cs= getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER+"='"+ phone +"'",null,null);
+            Cursor cs = getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + phone + "'", null, null);
 
-            if (cs != null && cs.getCount() > 0)
-            {
+            if (cs != null && cs.getCount() > 0) {
                 cs.moveToFirst();
-                name = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                name = cs.getString(cs.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
                 cs.close();
             }
 
@@ -104,7 +103,7 @@ public class Contact_Messages extends ListActivity{
     private void populateSmsList() {
         String strUriCon = "content://sms/conversations/" + thread;
         Uri uriSmsConversations = Uri.parse(strUriCon);
-        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null,"date");
+        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null, "date");
 
         if (c != null) {
 
@@ -136,9 +135,9 @@ public class Contact_Messages extends ListActivity{
         adapter.notifyDataSetChanged();
     }
 
-    private String getPhoneNumber(String uriString){
+    private String getPhoneNumber(String uriString) {
         Uri uri = Uri.parse(uriString);
-        String where = "thread_id="+thread;
+        String where = "thread_id=" + thread;
         Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
         String phone = "";
 
@@ -164,6 +163,9 @@ public class Contact_Messages extends ListActivity{
             listItems.remove(0); /// remove first item;
             tempList.addAll(listItems);
             listItems.clear();
+
+            if (c.getCount() > maxListSize)
+                listItems.add("Press to show more entries");
 
             c.moveToPosition(c.getCount() - maxListSize);
 
@@ -200,7 +202,7 @@ public class Contact_Messages extends ListActivity{
 
     }
 
-    public void sendMessage(){
+    public void sendMessage() {
 
 
         String SENT = "SMS_SENT";
@@ -213,11 +215,10 @@ public class Contact_Messages extends ListActivity{
                 new Intent(DELIVERED), 0);
 
         //---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "SMS sent",
                                 Toast.LENGTH_SHORT).show();
@@ -243,11 +244,10 @@ public class Contact_Messages extends ListActivity{
         }, new IntentFilter(SENT));
 
         //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "SMS delivered",
                                 Toast.LENGTH_SHORT).show();
@@ -264,14 +264,13 @@ public class Contact_Messages extends ListActivity{
         SmsManager smsman = SmsManager.getDefault();
 
 
-
-        try{
-            smsman.sendTextMessage(phone,null, sms_sd, sentsms, deliveredsms);
-        }catch (Exception e){
+        try {
+            smsman.sendTextMessage(phone, null, sms_sd, sentsms, deliveredsms);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-       adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
 
     }
 
@@ -280,9 +279,10 @@ public class Contact_Messages extends ListActivity{
         super.onListItemClick(l, v, position, id);
 
         if (listItems.get(position).equals("Press to show more entries")) {
+            int focus = adapter.getCount() - 1;
             increaseList(50);
+            l.setSelectionFromTop(maxListSize - focus, 105);
         }
-
     }
 }
 
