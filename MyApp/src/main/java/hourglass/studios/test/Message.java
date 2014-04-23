@@ -30,9 +30,11 @@ import java.util.HashSet;
 public class Message extends ListActivity {
 
     //Contact List
-    ArrayList<String> contacts = new ArrayList<String>();
-    private EditText phone_rc, sms_rc;
-    private String phone_sd, sms_sd;
+    private ArrayList<String> contacts = new ArrayList<String>();
+    private EditText phoneReceived, smsReceived;
+    private String phoneSent, smsSent;
+    private BroadcastReceiver sentReceiver;
+    private BroadcastReceiver deliveredReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,10 @@ public class Message extends ListActivity {
 
         initializeList();
 
-        phone_rc = (EditText) findViewById(R.id.textphone);
-        sms_rc = (EditText) findViewById(R.id.textsms);
+        phoneReceived = (EditText) findViewById(R.id.textphone);
+        smsReceived = (EditText) findViewById(R.id.textsms);
 
         autoCompleteCleaner();
-
     }
 
     public void initializeList() {
@@ -161,12 +162,11 @@ public class Message extends ListActivity {
     public void buttonSendOnClick(View v) {
 
 
-        phone_sd = String.valueOf(phone_rc.getText()).replaceAll("[^0-9+]", "");
+        phoneSent = String.valueOf(phoneReceived.getText()).replaceAll("[^0-9+]", "");
 
-        sms_sd = String.valueOf(sms_rc.getText());
+        smsSent = String.valueOf(smsReceived.getText());
 
         sendMessage();
-
     }
 
     public void sendMessage() {
@@ -174,6 +174,7 @@ public class Message extends ListActivity {
 
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
+        SmsManager smsMan = SmsManager.getDefault();
 
         PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
@@ -181,8 +182,7 @@ public class Message extends ListActivity {
         PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
 
-        //---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver() {
+        sentReceiver =new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -208,10 +208,9 @@ public class Message extends ListActivity {
                         break;
                 }
             }
-        }, new IntentFilter(SENT));
+        };
 
-        //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver() {
+        deliveredReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -225,19 +224,30 @@ public class Message extends ListActivity {
                         break;
                 }
             }
-        }, new IntentFilter(DELIVERED));
+        };
 
+        //---when the SMS has been sent---
+        registerReceiver(sentReceiver, new IntentFilter(SENT));
 
-        SmsManager smsMan = SmsManager.getDefault();
-
+        //---when the SMS has been delivered---
+        registerReceiver(deliveredReceiver, new IntentFilter(DELIVERED));
 
         try {
-            smsMan.sendTextMessage(phone_sd, null, sms_sd, sentSms, deliveredSms);
+            smsMan.sendTextMessage(phoneSent, null, smsSent, sentSms, deliveredSms);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         finish();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(sentReceiver != null && deliveredReceiver != null) {
+            unregisterReceiver(sentReceiver);
+            unregisterReceiver(deliveredReceiver);
+        }
     }
 }

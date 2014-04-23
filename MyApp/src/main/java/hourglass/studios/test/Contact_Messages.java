@@ -30,15 +30,18 @@ public class Contact_Messages extends ListActivity {
     private int maxListSize = 50;
     private String thread, phone = "";
     private String name = "";
-    private EditText sms_rc;
+    private EditText smsReceived;
     private TextView contact;
-    private String sms_sd;
+    private String smsSent = "";
+    private BroadcastReceiver sentReceiver;
+    private BroadcastReceiver deliveredReceiver;
+
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    private ArrayList<String> listItems = new ArrayList<String>();
+    private ArrayList<String> listContactSms = new ArrayList<String>();
 
     //DEFINING STRING ADAPTER WHICH WILL HANDLE DATA OF LISTVIEW
-    private ArrayAdapter<String> adapter;
+    private ArrayAdapter<String> contactSmsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +56,11 @@ public class Contact_Messages extends ListActivity {
         }
 
         contact = (TextView) findViewById(R.id.textCont);
-        sms_rc = (EditText) findViewById(R.id.textsms);
+        smsReceived = (EditText) findViewById(R.id.textsms);
 
 
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
-        setListAdapter(adapter);
+        contactSmsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listContactSms);
+        setListAdapter(contactSmsAdapter);
 
         if (phone.equals("")) {
             phone = getPhoneNumber("content://sms/inbox");
@@ -108,7 +111,7 @@ public class Contact_Messages extends ListActivity {
         if (c != null) {
 
             if (c.getCount() > maxListSize)
-                listItems.add("Press to show more entries");
+                listContactSms.add("Press to show more entries");
 
             c.moveToPosition(c.getCount() - maxListSize);
 
@@ -119,20 +122,20 @@ public class Contact_Messages extends ListActivity {
                 if (c.getInt(c.getColumnIndexOrThrow("type")) == 1)                       // type ALL - 0,DRAFTS - 3,INBOX - 1,OUTBOX - 4, SENT - 2
                 {
                     if (!(name == null) && !name.equals(""))
-                        listItems.add(name + "\n\n" + body);
+                        listContactSms.add(name + "\n\n" + body);
 
-                    else listItems.add(number + "\n\n" + body);
+                    else listContactSms.add(number + "\n\n" + body);
 
                 } else if (c.getInt(c.getColumnIndexOrThrow("type")) == 2)
-                    listItems.add("Me" + "\n\n" + body);
+                    listContactSms.add("Me" + "\n\n" + body);
 
-                else listItems.add(number + "\n\n" + body);
+                else listContactSms.add(number + "\n\n" + body);
             }
             c.close();
 
         }
 
-        adapter.notifyDataSetChanged();
+        contactSmsAdapter.notifyDataSetChanged();
     }
 
     private String getPhoneNumber(String uriString) {
@@ -160,12 +163,12 @@ public class Contact_Messages extends ListActivity {
 
         if (c != null) {
 
-            listItems.remove(0); /// remove first item;
-            tempList.addAll(listItems);
-            listItems.clear();
+            listContactSms.remove(0); /// remove first item;
+            tempList.addAll(listContactSms);
+            listContactSms.clear();
 
             if (c.getCount() > maxListSize)
-                listItems.add("Press to show more entries");
+                listContactSms.add("Press to show more entries");
 
             c.moveToPosition(c.getCount() - maxListSize);
 
@@ -176,28 +179,28 @@ public class Contact_Messages extends ListActivity {
                 if (c.getInt(c.getColumnIndexOrThrow("type")) == 1)    // type ALL - 0,DRAFTS - 3,INBOX - 1,OUTBOX - 4, SENT - 2
                 {
                     if (!(name == null) && !name.equals(""))
-                        listItems.add(name + "\n\n" + body);
+                        listContactSms.add(name + "\n\n" + body);
 
-                    else listItems.add(number + "\n\n" + body);
+                    else listContactSms.add(number + "\n\n" + body);
 
                 } else if (c.getInt(c.getColumnIndexOrThrow("type")) == 2)
-                    listItems.add("Me" + "\n\n" + body);
+                    listContactSms.add("Me" + "\n\n" + body);
 
-                else listItems.add(number + "\n\n" + body);
+                else listContactSms.add(number + "\n\n" + body);
             }
             c.close();
 
-            listItems.addAll(tempList);
+            listContactSms.addAll(tempList);
         }
 
-        adapter.notifyDataSetChanged();
+        contactSmsAdapter.notifyDataSetChanged();
     }
 
 
     public void buttonSendOnClick(View v) {
 
-        sms_sd = String.valueOf(sms_rc.getText());
-
+        smsSent = String.valueOf(smsReceived.getText());
+        smsReceived.setText("");
         sendMessage();
 
     }
@@ -207,15 +210,16 @@ public class Contact_Messages extends ListActivity {
 
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
+        SmsManager smsMan = SmsManager.getDefault();
 
-        PendingIntent sentsms = PendingIntent.getBroadcast(this, 0,
+        PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
 
-        PendingIntent deliveredsms = PendingIntent.getBroadcast(this, 0,
+        PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
 
-        //---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver() {
+
+        sentReceiver =new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -241,10 +245,9 @@ public class Contact_Messages extends ListActivity {
                         break;
                 }
             }
-        }, new IntentFilter(SENT));
+        };
 
-        //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver() {
+        deliveredReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -258,19 +261,22 @@ public class Contact_Messages extends ListActivity {
                         break;
                 }
             }
-        }, new IntentFilter(DELIVERED));
+        };
 
+        //---when the SMS has been sent---
+        registerReceiver(sentReceiver, new IntentFilter(SENT));
 
-        SmsManager smsman = SmsManager.getDefault();
-
+        //---when the SMS has been delivered---
+        registerReceiver(deliveredReceiver, new IntentFilter(DELIVERED));
 
         try {
-            smsman.sendTextMessage(phone, null, sms_sd, sentsms, deliveredsms);
+            smsMan.sendTextMessage(phone, null, smsSent, sentSms, deliveredSms);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        adapter.notifyDataSetChanged();
+        listContactSms.add("Me" + "\n\n" + smsSent);
+        contactSmsAdapter.notifyDataSetChanged();
 
     }
 
@@ -278,10 +284,19 @@ public class Contact_Messages extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        if (listItems.get(position).equals("Press to show more entries")) {
-            int focus = adapter.getCount() - 1;
+        if (listContactSms.get(position).equals("Press to show more entries")) {
+            int focus = contactSmsAdapter.getCount() - 1;
             increaseList(50);
             l.setSelectionFromTop(maxListSize - focus, 105);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(sentReceiver != null && deliveredReceiver != null) {
+            unregisterReceiver(sentReceiver);
+            unregisterReceiver(deliveredReceiver);
         }
     }
 }
