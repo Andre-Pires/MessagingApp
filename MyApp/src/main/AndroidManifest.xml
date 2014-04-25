@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="hourglass.studios.test.Contact_Messages"
+            android:name=".ContactMessages"
             android:label="ContactMessage">
             <intent-filter>
                 <action android:name="hourglass.studios.test.Message" />

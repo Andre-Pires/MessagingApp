@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static hourglass.studios.test.R.layout.activity_main;
@@ -31,12 +32,14 @@ public class MainActivity extends ListActivity {
     //Keeps track of list items' thread number, to pass to contact's messages
     private ArrayList<String> listThreadNumb = new ArrayList<String>();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(activity_main);
+
+        threadAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listThreadItems);
+        setListAdapter(threadAdapter);
 
         createConversations();
     }
@@ -44,14 +47,10 @@ public class MainActivity extends ListActivity {
 
     private void createConversations() {
 
-        threadAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listThreadItems);
-        setListAdapter(threadAdapter);
-
-
         String strUriCon = "content://sms/conversations";
         Uri uriSmsThreads = Uri.parse(strUriCon);
         Cursor threadCursor = getContentResolver().query(uriSmsThreads, null, null, null, "date");
-
+        String[] uriSms = {"content://sms/inbox", "content://sms/sent","content://sms/drafts","content://sms/outbox","content://sms/failed"};
 
         if (threadCursor != null && threadCursor.getCount() > 0) {
             threadCursor.moveToLast();
@@ -64,34 +63,13 @@ public class MainActivity extends ListActivity {
 
                 listThreadNumb.add(thread);
 
-                Uri uri = Uri.parse("content://sms/inbox");
-                String where = "thread_id=" + thread;
-                Cursor contactCursor = getContentResolver().query(uri, null, where, null, null);
-
-                if (contactCursor != null && contactCursor.moveToFirst()) {
-                    number = contactCursor.getString(contactCursor.getColumnIndexOrThrow("address"));
-                    contactCursor.close();
-                } else if (!number.equals("")){
-
-                    // To check for name/number in any sms type
-                    if (number.equals("")) {
-                        number = getPhoneNumber("content://sms/sent", thread);
-                    }
-                    if (number.equals("")) {
-                        number = getPhoneNumber("content://sms/drafts", thread);
-                    }
-                    if (number.equals("")) {
-                        number = getPhoneNumber("content://sms/outbox", thread);
-                    }
-                    if (number.equals("")) {
-                        number = getPhoneNumber("content://sms/failed", thread);
-                    }
+                int counter = 0;
+                while (number.equals("")) {
+                    number = getPhoneNumber(uriSms[counter], thread);
+                    counter++;
                 }
-
                 // arranjar para suportar varios numeros
-                final boolean stringEmpty = number != null && number.equals("");
-
-                if (!stringEmpty)
+                if (!number.equals(""))
                     name = getContactName(number);
 
                 listThreadItems.add(name + "\n\n" + smsBody);
@@ -154,14 +132,14 @@ public class MainActivity extends ListActivity {
         super.onListItemClick(l, v, position, id);
 
         try {
-            contactMessages = Class.forName("hourglass.studios.test.Contact_Messages");
+            contactMessages = Class.forName("hourglass.studios.test.ContactMessages");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
         contactSms = new Intent(this, contactMessages);
         contactSms.putExtra("thread", listThreadNumb.get(position));
-        startActivityForResult(contactSms, RESULT_OK);
+        startActivity(contactSms);
 
     }
 
@@ -189,17 +167,5 @@ public class MainActivity extends ListActivity {
 
         threadAdapter.notifyDataSetChanged();
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            String message = extras.getString("textMessage");
-            if (message != null && !message.equals("")) {
-                listThreadItems.add(message);
-                threadAdapter.notifyDataSetChanged();
-            }
-        }
     }
 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 /**
  * Created by Pires on 6/29/13.
  */
-public class Contact_Messages extends ListActivity {
+public class ContactMessages extends ListActivity {
 
     private int maxListSize = 50;
     private String thread, phone = "";
@@ -49,6 +49,9 @@ public class Contact_Messages extends ListActivity {
 
         setContentView(R.layout.contact_messages);
 
+        String[] uriSms = {"content://sms/inbox", "content://sms/sent","content://sms/drafts","content://sms/outbox","content://sms/failed"};
+
+
         //---- recovering the thread_id from main_activity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -62,20 +65,10 @@ public class Contact_Messages extends ListActivity {
         contactSmsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listContactSms);
         setListAdapter(contactSmsAdapter);
 
-        if (phone.equals("")) {
-            phone = getPhoneNumber("content://sms/inbox");
-        }
-        if (phone.equals("")) {
-            phone = getPhoneNumber("content://sms/sent");
-        }
-        if (phone.equals("")) {
-            phone = getPhoneNumber("content://sms/drafts");
-        }
-        if (phone.equals("")) {
-            phone = getPhoneNumber("content://sms/outbox");
-        }
-        if (phone.equals("")) {
-            phone = getPhoneNumber("content://sms/failed");
+        int counter = 0;
+        while (phone.equals("")) {
+            phone = getPhoneNumber(uriSms[counter], thread);
+            counter++;
         }
 
         if (!(phone.equals(""))) {
@@ -138,7 +131,7 @@ public class Contact_Messages extends ListActivity {
         contactSmsAdapter.notifyDataSetChanged();
     }
 
-    private String getPhoneNumber(String uriString) {
+    private String getPhoneNumber(String uriString, String thread) {
         Uri uri = Uri.parse(uriString);
         String where = "thread_id=" + thread;
         Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
