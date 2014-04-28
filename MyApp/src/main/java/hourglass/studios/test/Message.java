@@ -6,10 +6,12 @@ import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
@@ -57,7 +59,7 @@ public class Message extends ListActivity {
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
 
-        if (cur.getCount() > 0)
+        if (cur != null && cur.getCount() > 0)
             while (cur.moveToNext()) {
 
                 String id = cur.getString(
@@ -84,8 +86,8 @@ public class Message extends ListActivity {
                     }
                     pCur.close();
                 }
+                cur.close();
             }
-        cur.close();
 
 
         //eliminating duplicates and sort list
@@ -111,7 +113,7 @@ public class Message extends ListActivity {
             public void onItemClick(AdapterView<?> av, View arg1, int index, long arg3) {
 
                 String number = (String) av.getItemAtPosition(index);
-                number = number.replaceAll("( \n [a-zA-Z]*)", "");
+                number = number != null ? number.replaceAll("( \n [a-zA-Z]*)", "") : "";
                 textView.setText(number);
 
             }
@@ -166,7 +168,14 @@ public class Message extends ListActivity {
 
         smsSent = String.valueOf(smsReceived.getText());
 
-        sendMessage();
+        if (phoneSent.isEmpty())
+            Toast.makeText(getBaseContext(), "Please choose a valid number.",
+            Toast.LENGTH_SHORT).show();
+        else if (smsSent.isEmpty())
+            Toast.makeText(getBaseContext(), "Message field is empty.",
+            Toast.LENGTH_SHORT).show();
+        else
+            sendMessage();
     }
 
     public void sendMessage() {
@@ -182,7 +191,7 @@ public class Message extends ListActivity {
         PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
 
-        sentReceiver =new BroadcastReceiver() {
+        sentReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -234,6 +243,11 @@ public class Message extends ListActivity {
 
         try {
             smsMan.sendTextMessage(phoneSent, null, smsSent, sentSms, deliveredSms);
+            ContentValues values = new ContentValues();
+            values.put("address", phoneSent);
+            values.put("date", System.currentTimeMillis());
+            values.put("body", smsSent);
+            getContentResolver().insert(Uri.parse("content://sms/sent"), values);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -245,7 +259,7 @@ public class Message extends ListActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(sentReceiver != null && deliveredReceiver != null) {
+        if (sentReceiver != null && deliveredReceiver != null) {
             unregisterReceiver(sentReceiver);
             unregisterReceiver(deliveredReceiver);
         }

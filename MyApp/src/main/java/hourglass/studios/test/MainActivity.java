@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static hourglass.studios.test.R.layout.activity_main;
@@ -20,7 +19,6 @@ import static hourglass.studios.test.R.layout.activity_main;
 public class MainActivity extends ListActivity {
 
     private Class textMessage, contactMessages;
-    private Intent startSettings, sms, contactSms;
 
 
     //List of array strings which will serve as list items
@@ -50,12 +48,19 @@ public class MainActivity extends ListActivity {
         String strUriCon = "content://sms/conversations";
         Uri uriSmsThreads = Uri.parse(strUriCon);
         Cursor threadCursor = getContentResolver().query(uriSmsThreads, null, null, null, "date");
-        String[] uriSms = {"content://sms/inbox", "content://sms/sent","content://sms/drafts","content://sms/outbox","content://sms/failed"};
+        String[] uriSms = new String[]{
+                "content://sms/inbox",
+                "content://sms/sent",
+                "content://sms/drafts",
+                "content://sms/outbox",
+                "content://sms/failed"};
+
+        if (!listThreadItems.isEmpty())
+            listThreadItems.clear();
 
         if (threadCursor != null && threadCursor.getCount() > 0) {
             threadCursor.moveToLast();
             do {
-
                 String smsBody = threadCursor.getString(threadCursor.getColumnIndexOrThrow("snippet"));
                 String thread = threadCursor.getString(threadCursor.getColumnIndexOrThrow("thread_id"));
                 String number = "";
@@ -121,7 +126,7 @@ public class MainActivity extends ListActivity {
             e.printStackTrace();
         }
 
-        sms = new Intent(MainActivity.this, textMessage);
+        Intent sms = new Intent(MainActivity.this, textMessage);
         startActivity(sms);
 
 
@@ -137,7 +142,7 @@ public class MainActivity extends ListActivity {
             e.printStackTrace();
         }
 
-        contactSms = new Intent(this, contactMessages);
+        Intent contactSms = new Intent(this, contactMessages);
         contactSms.putExtra("thread", listThreadNumb.get(position));
         startActivity(contactSms);
 
@@ -150,11 +155,12 @@ public class MainActivity extends ListActivity {
         return true;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startSettings = new Intent("hourglass.studios.test.SETTINGS");
+                Intent startSettings = new Intent("hourglass.studios.test.SETTINGS");
                 startActivity(startSettings);
         }
 
@@ -165,7 +171,6 @@ public class MainActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 
-        threadAdapter.notifyDataSetChanged();
-
+        createConversations();
     }
 }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -31,7 +32,6 @@ public class ContactMessages extends ListActivity {
     private String thread, phone = "";
     private String name = "";
     private EditText smsReceived;
-    private TextView contact;
     private String smsSent = "";
     private BroadcastReceiver sentReceiver;
     private BroadcastReceiver deliveredReceiver;
@@ -49,7 +49,7 @@ public class ContactMessages extends ListActivity {
 
         setContentView(R.layout.contact_messages);
 
-        String[] uriSms = {"content://sms/inbox", "content://sms/sent","content://sms/drafts","content://sms/outbox","content://sms/failed"};
+        String[] uriSms = {"content://sms/inbox", "content://sms/sent", "content://sms/drafts", "content://sms/outbox", "content://sms/failed"};
 
 
         //---- recovering the thread_id from main_activity
@@ -58,7 +58,7 @@ public class ContactMessages extends ListActivity {
             thread = extras.getString("thread");
         }
 
-        contact = (TextView) findViewById(R.id.textCont);
+        TextView contact = (TextView) findViewById(R.id.textCont);
         smsReceived = (EditText) findViewById(R.id.textsms);
 
 
@@ -196,6 +196,12 @@ public class ContactMessages extends ListActivity {
         smsReceived.setText("");
         sendMessage();
 
+        if (smsSent.isEmpty())
+            Toast.makeText(getBaseContext(), "Message field is empty.",
+                    Toast.LENGTH_SHORT).show();
+        else
+            sendMessage();
+
     }
 
     public void sendMessage() {
@@ -212,7 +218,7 @@ public class ContactMessages extends ListActivity {
                 new Intent(DELIVERED), 0);
 
 
-        sentReceiver =new BroadcastReceiver() {
+        sentReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -264,9 +270,16 @@ public class ContactMessages extends ListActivity {
 
         try {
             smsMan.sendTextMessage(phone, null, smsSent, sentSms, deliveredSms);
+            ContentValues values = new ContentValues();
+            values.put("address", phone);
+            values.put("date", System.currentTimeMillis());
+            values.put("body", smsSent);
+            getContentResolver().insert(Uri.parse("content://sms/sent"), values);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
 
         listContactSms.add("Me" + "\n\n" + smsSent);
         contactSmsAdapter.notifyDataSetChanged();
@@ -287,7 +300,7 @@ public class ContactMessages extends ListActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(sentReceiver != null && deliveredReceiver != null) {
+        if (sentReceiver != null && deliveredReceiver != null) {
             unregisterReceiver(sentReceiver);
             unregisterReceiver(deliveredReceiver);
         }

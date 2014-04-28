@@ -40,30 +40,50 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="hourglass.studios.test.Message"
+            android:name=".Message"
             android:label="Message">
             <intent-filter>
-                <action android:name="hourglass.studios.test.Message" />
-
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ContactMessages"
             android:label="ContactMessage">
-            <intent-filter>
-                <action android:name="hourglass.studios.test.Message" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+                <intent-filter>
+                    <action android:name="android.intent.action.SEND" />
+                    <action android:name="android.intent.action.SENDTO" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                    <category android:name="android.intent.category.BROWSABLE" />
+                    <data android:scheme="sms" />
+                    <data android:scheme="smsto" />
+                    <data android:scheme="mms" />
+                    <data android:scheme="mmsto" />
+                </intent-filter>
         </activity>
 
-        <receiver android:name=".MessageReceiver">
+        <!-- BroadcastReceiver that listens for incoming SMS messages -->
+        <receiver android:name=".MessageReceiver"
+            android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
         </receiver>
 
+        <!-- BroadcastReceiver that listens for incoming MMS messages -->
+        <receiver android:name=".MessageReceiver"
+            android:permission="android.permission.BROADCAST_WAP_PUSH">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+        </receiver>
     </application>
 
 

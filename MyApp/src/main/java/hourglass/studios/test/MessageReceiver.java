@@ -2,13 +2,12 @@ package hourglass.studios.test;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
@@ -19,18 +18,16 @@ import android.widget.Toast;
  */
 public class MessageReceiver extends BroadcastReceiver {
 
-    SharedPreferences prefs;
-    ContentResolver contentResolver;
+    private ContentResolver contentResolver;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        int counter;
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Bundle bundle = intent.getExtras();
         String sms = "", phone = "";
         SmsMessage[] messages;
         contentResolver = context.getContentResolver();
+        ContentValues values;
 
         if (bundle != null) {
 
@@ -40,23 +37,14 @@ public class MessageReceiver extends BroadcastReceiver {
                 messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                 phone += messages[i].getOriginatingAddress();
                 sms += messages[i].getMessageBody();
+                values = new ContentValues();
+                values.put("address", phone);
+                values.put("date", System.currentTimeMillis());
+                values.put("body", sms);
+                contentResolver.insert(Uri.parse("content://sms/inbox"), values);
             }
 
             Toast.makeText(context, "You have a new message from - " + getContactName(phone) + " .", Toast.LENGTH_SHORT).show();
-
-
-            counter = prefs.getInt("counter", 0);
-
-            SharedPreferences.Editor prefEditor = prefs.edit();
-
-
-            prefEditor.putString("message_" + counter, sms);
-
-            ++counter;
-            prefEditor.putInt("counter", counter);
-
-            prefEditor.commit();
-
         }
 
     }
