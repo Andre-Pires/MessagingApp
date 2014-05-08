@@ -35,6 +35,8 @@ public class ContactMessages extends ListActivity {
     private String smsSent = "";
     private BroadcastReceiver sentReceiver;
     private BroadcastReceiver deliveredReceiver;
+    private String SENT = "SMS_SENT";
+    private String DELIVERED = "SMS_DELIVERED";
 
 
     //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
@@ -49,8 +51,6 @@ public class ContactMessages extends ListActivity {
 
         setContentView(R.layout.contact_messages);
 
-        String[] uriSms = {"content://sms/inbox", "content://sms/sent", "content://sms/drafts", "content://sms/outbox", "content://sms/failed"};
-
 
         //---- recovering the thread_id from main_activity
         Bundle extras = getIntent().getExtras();
@@ -61,9 +61,24 @@ public class ContactMessages extends ListActivity {
         TextView contact = (TextView) findViewById(R.id.textCont);
         smsReceived = (EditText) findViewById(R.id.textsms);
 
+        registerReceivers();
 
         contactSmsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listContactSms);
         setListAdapter(contactSmsAdapter);
+
+        ListView l = getListView();
+        l.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+        l.setStackFromBottom(true);
+
+        //show contact's name and number(if possible)
+        showContactInfo(contact);
+
+        //contact's sms list
+        populateSmsList();
+    }
+
+    private void showContactInfo(TextView contact) {
+        String[] uriSms = {"content://sms/inbox", "content://sms/sent", "content://sms/drafts", "content://sms/outbox", "content://sms/failed"};
 
         int counter = 0;
         while (phone.equals("")) {
@@ -91,9 +106,6 @@ public class ContactMessages extends ListActivity {
 
         } else
             contact.setText("Failed to retrieve name");
-
-        //-------------contact's sms list-----------------
-        populateSmsList();
     }
 
     private void populateSmsList() {
@@ -193,22 +205,22 @@ public class ContactMessages extends ListActivity {
     public void buttonSendOnClick(View v) {
 
         smsSent = String.valueOf(smsReceived.getText());
-        smsReceived.setText("");
-        sendMessage();
 
         if (smsSent.isEmpty())
             Toast.makeText(getBaseContext(), "Message field is empty.",
                     Toast.LENGTH_SHORT).show();
-        else
+        else{
+            smsReceived.setText("");
             sendMessage();
+        }
+
 
     }
 
     public void sendMessage() {
 
 
-        String SENT = "SMS_SENT";
-        String DELIVERED = "SMS_DELIVERED";
+
         SmsManager smsMan = SmsManager.getDefault();
 
         PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
@@ -218,6 +230,25 @@ public class ContactMessages extends ListActivity {
                 new Intent(DELIVERED), 0);
 
 
+        try {
+            smsMan.sendTextMessage(phone, null, smsSent, sentSms, deliveredSms);
+            ContentValues values = new ContentValues();
+            values.put("address", phone);
+            values.put("date", System.currentTimeMillis());
+            values.put("body", smsSent);
+            getContentResolver().insert(Uri.parse("content://sms/sent"), values);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        listContactSms.add("Me" + "\n\n" + smsSent);
+        contactSmsAdapter.notifyDataSetChanged();
+
+    }
+
+    private void registerReceivers() {
         sentReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
@@ -259,6 +290,7 @@ public class ContactMessages extends ListActivity {
                                 Toast.LENGTH_SHORT).show();
                         break;
                 }
+
             }
         };
 
@@ -267,23 +299,6 @@ public class ContactMessages extends ListActivity {
 
         //---when the SMS has been delivered---
         registerReceiver(deliveredReceiver, new IntentFilter(DELIVERED));
-
-        try {
-            smsMan.sendTextMessage(phone, null, smsSent, sentSms, deliveredSms);
-            ContentValues values = new ContentValues();
-            values.put("address", phone);
-            values.put("date", System.currentTimeMillis());
-            values.put("body", smsSent);
-            getContentResolver().insert(Uri.parse("content://sms/sent"), values);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-        listContactSms.add("Me" + "\n\n" + smsSent);
-        contactSmsAdapter.notifyDataSetChanged();
-
     }
 
     @Override

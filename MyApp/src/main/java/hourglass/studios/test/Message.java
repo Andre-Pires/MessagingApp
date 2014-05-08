@@ -3,13 +3,16 @@ package hourglass.studios.test;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,14 +32,19 @@ import java.util.HashSet;
 /**
  * Created by Pires on 6/29/13.
  */
-public class Message extends ListActivity {
+public class Message extends ListActivity implements
+        LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int URL_LOADER = 0;
     //Contact List
     private ArrayList<String> contacts = new ArrayList<String>();
     private EditText phoneReceived, smsReceived;
     private String phoneSent, smsSent;
     private BroadcastReceiver sentReceiver;
     private BroadcastReceiver deliveredReceiver;
+    private Cursor cur;
+    private String SENT = "SMS_SENT";
+    private String DELIVERED = "SMS_DELIVERED";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,20 +54,23 @@ public class Message extends ListActivity {
 
         initializeList();
 
+        registerReceivers();
+
         phoneReceived = (EditText) findViewById(R.id.textphone);
         smsReceived = (EditText) findViewById(R.id.textsms);
 
-        autoCompleteCleaner();
+        getLoaderManager().initLoader(URL_LOADER, null, this);
+
     }
 
-    public void initializeList() {
+    private void initializeList() {
 
 
         ContentResolver cr = getContentResolver();
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        //Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
 
-        if (cur != null && cur.getCount() > 0)
+        if (cur != null && cur.getCount() > 0) {
             while (cur.moveToNext()) {
 
                 String id = cur.getString(
@@ -86,10 +97,9 @@ public class Message extends ListActivity {
                     }
                     pCur.close();
                 }
-                cur.close();
             }
-
-
+            cur.close();
+        }
         //eliminating duplicates and sort list
         HashSet hs = new HashSet();
         hs.addAll(contacts);
@@ -120,8 +130,7 @@ public class Message extends ListActivity {
         });
     }
 
-
-    public String cellType(int type) {
+    private String cellType(int type) {
 
 
         String stringType = "";
@@ -170,27 +179,16 @@ public class Message extends ListActivity {
 
         if (phoneSent.isEmpty())
             Toast.makeText(getBaseContext(), "Please choose a valid number.",
-            Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_SHORT).show();
         else if (smsSent.isEmpty())
             Toast.makeText(getBaseContext(), "Message field is empty.",
-            Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_SHORT).show();
         else
             sendMessage();
     }
 
-    public void sendMessage() {
 
-
-        String SENT = "SMS_SENT";
-        String DELIVERED = "SMS_DELIVERED";
-        SmsManager smsMan = SmsManager.getDefault();
-
-        PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
-                new Intent(SENT), 0);
-
-        PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
-                new Intent(DELIVERED), 0);
-
+    private void registerReceivers() {
         sentReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
@@ -232,6 +230,7 @@ public class Message extends ListActivity {
                                 Toast.LENGTH_SHORT).show();
                         break;
                 }
+
             }
         };
 
@@ -240,6 +239,17 @@ public class Message extends ListActivity {
 
         //---when the SMS has been delivered---
         registerReceiver(deliveredReceiver, new IntentFilter(DELIVERED));
+    }
+
+    private void sendMessage() {
+
+        SmsManager smsMan = SmsManager.getDefault();
+
+        PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
+                new Intent(SENT), 0);
+
+        PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
+                new Intent(DELIVERED), 0);
 
         try {
             smsMan.sendTextMessage(phoneSent, null, smsSent, sentSms, deliveredSms);
@@ -253,7 +263,6 @@ public class Message extends ListActivity {
         }
 
         finish();
-
     }
 
     @Override
@@ -263,5 +272,42 @@ public class Message extends ListActivity {
             unregisterReceiver(sentReceiver);
             unregisterReceiver(deliveredReceiver);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
+    /*
+     * Takes action based on the ID of the Loader that's being created
+     */
+
+        switch (loaderID) {
+            case URL_LOADER:
+                // Returns a new CursorLoader
+                return new CursorLoader(
+                        this,   // Parent activity context
+                        ContactsContract.Contacts.CONTENT_URI,        // Table to query
+                        null,     // Projection to return
+                        null,            // No selection clause
+                        null,            // No selection arguments
+                        null             // Default sort order
+                );
+            default:
+                // An invalid id was passed in
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        cur = data;
+
+        initializeList();
+        autoCompleteCleaner();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

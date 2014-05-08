@@ -1,7 +1,11 @@
 package hourglass.studios.test;
 
 import android.app.ListActivity;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,23 +13,28 @@ import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import static hourglass.studios.test.R.layout.activity_main;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ListActivity implements
+        LoaderManager.LoaderCallbacks<Cursor>{
 
     private Class textMessage, contactMessages;
 
-
+    private static final int URL_LOADER = 0;
     //List of array strings which will serve as list items
     private ArrayList<String> listThreadItems = new ArrayList<String>();
 
     //Defining string adapter which will handle data of listview
     private ArrayAdapter<String> threadAdapter;
+
+    private Cursor threadCursor;
 
     //Keeps track of list items' thread number, to pass to contact's messages
     private ArrayList<String> listThreadNumb = new ArrayList<String>();
@@ -39,15 +48,16 @@ public class MainActivity extends ListActivity {
         threadAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listThreadItems);
         setListAdapter(threadAdapter);
 
-        createConversations();
+        getLoaderManager().initLoader(URL_LOADER, null, this);
     }
-
 
     private void createConversations() {
 
+        /* Legacy code - To be deleted
         String strUriCon = "content://sms/conversations";
         Uri uriSmsThreads = Uri.parse(strUriCon);
         Cursor threadCursor = getContentResolver().query(uriSmsThreads, null, null, null, "date");
+        */
         String[] uriSms = new String[]{
                 "content://sms/inbox",
                 "content://sms/sent",
@@ -55,8 +65,11 @@ public class MainActivity extends ListActivity {
                 "content://sms/outbox",
                 "content://sms/failed"};
 
-        if (!listThreadItems.isEmpty())
+        if (!listThreadItems.isEmpty()) {
             listThreadItems.clear();
+            listThreadNumb.clear();
+        }
+
 
         if (threadCursor != null && threadCursor.getCount() > 0) {
             threadCursor.moveToLast();
@@ -171,6 +184,47 @@ public class MainActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 
+        getLoaderManager().destroyLoader(URL_LOADER);
+        getLoaderManager().initLoader(URL_LOADER, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle)
+    {
+    /*
+     * Takes action based on the ID of the Loader that's being created
+     */
+
+        String strUriCon = "content://sms/conversations";
+        Uri uriSmsThreads = Uri.parse(strUriCon);
+
+        switch (loaderID) {
+            case URL_LOADER:
+                // Returns a new CursorLoader
+                return new CursorLoader(
+                        getBaseContext(),   // Parent activity context
+                        uriSmsThreads,        // Table to query
+                        null,     // Projection to return
+                        null,            // No selection clause
+                        null,            // No selection arguments
+                        "date"             // Default sort order
+                );
+            default:
+                // An invalid id was passed in
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        threadCursor = data;
+
         createConversations();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

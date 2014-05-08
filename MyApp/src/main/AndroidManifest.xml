@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="hourglass.studios.test.MainActivity"
-            android:label="MainActivity">
+            android:label="Feather SMS">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,7 +41,8 @@
         </activity>
         <activity
             android:name=".Message"
-            android:label="Message">
+            android:label="Compose a new Message"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
@@ -55,7 +56,8 @@
         </activity>
         <activity
             android:name=".ContactMessages"
-            android:label="ContactMessage">
+            android:label="ContactMessage"
+            android:windowSoftInputMode="adjustResize">
                 <intent-filter>
                     <action android:name="android.intent.action.SEND" />
                     <action android:name="android.intent.action.SENDTO" />
