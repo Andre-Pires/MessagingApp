@@ -24,7 +24,7 @@ public class MyCursorAdapter extends CursorAdapter {
 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        return inflater.inflate(R.layout.list_adapter, parent, false);
+        return inflater.inflate(R.layout.item_left, parent, false);
     }
 
     @Override
@@ -50,11 +50,11 @@ public class MyCursorAdapter extends CursorAdapter {
         if (!number.equals(""))
             name = getContactName(number, context);
 
-        TextView contactName = (TextView)view.findViewById(R.id.textView);
+        TextView contactName = (TextView)view.findViewById(R.id.leftName);
         contactName.setText(name);
 
         String tempString = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-        TextView smsBody = (TextView)view.findViewById(R.id.textView2);
+        TextView smsBody = (TextView)view.findViewById(R.id.leftText);
         if (tempString != null && tempString.length() > 100)
             smsBody.setText(tempString.substring(0, Math.min(tempString.length(), 100)) + " ...");
         else if (tempString != null)
