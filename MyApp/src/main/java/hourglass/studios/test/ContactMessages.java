@@ -67,7 +67,8 @@ public class ContactMessages extends ListActivity {
         l.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
         l.setStackFromBottom(true);
 
-        contactItemAdapter = new SmsListAdapter(this, R.layout.item_left, contactItems);
+        //layout int value not used
+        contactItemAdapter = new SmsListAdapter(this, 0, contactItems);
         l.setAdapter(contactItemAdapter);
 
 
@@ -168,7 +169,6 @@ public class ContactMessages extends ListActivity {
         String strUriCon = "content://sms/conversations/" + thread;
         Uri uriSmsConversations = Uri.parse(strUriCon);
         Cursor c = getContentResolver().query(uriSmsConversations, null, null, null, "date");
-        // ArrayList<String> tempList = new ArrayList<String>(); TODO
         ArrayList<SmsItem> tempList = new ArrayList<SmsItem>();
 
         int oldMaxListSize = maxListSize;

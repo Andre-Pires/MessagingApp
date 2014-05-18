@@ -28,11 +28,13 @@ public class MainActivity extends ListActivity implements
     private Class textMessage, contactMessages;
 
     private static final int URL_LOADER = 0;
+
+
     //List of array strings which will serve as list items
-    private ArrayList<String> listThreadItems = new ArrayList<String>();
+    private ArrayList<ThreadItem> listThreadItems = new ArrayList<ThreadItem>();
 
     //Defining string adapter which will handle data of listview
-    private ArrayAdapter<String> threadAdapter;
+    private ArrayAdapter<ThreadItem> threadAdapter;
 
     private Cursor threadCursor;
 
@@ -45,7 +47,8 @@ public class MainActivity extends ListActivity implements
 
         setContentView(activity_main);
 
-        threadAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listThreadItems);
+        //layout int value not used
+        threadAdapter = new ThreadListAdapter(this, 0, listThreadItems);
         setListAdapter(threadAdapter);
 
         getLoaderManager().initLoader(URL_LOADER, null, this);
@@ -53,11 +56,6 @@ public class MainActivity extends ListActivity implements
 
     private void createConversations() {
 
-        /* Legacy code - To be deleted
-        String strUriCon = "content://sms/conversations";
-        Uri uriSmsThreads = Uri.parse(strUriCon);
-        Cursor threadCursor = getContentResolver().query(uriSmsThreads, null, null, null, "date");
-        */
         String[] uriSms = new String[]{
                 "content://sms/inbox",
                 "content://sms/sent",
@@ -76,6 +74,7 @@ public class MainActivity extends ListActivity implements
             do {
                 String smsBody = threadCursor.getString(threadCursor.getColumnIndexOrThrow("snippet"));
                 String thread = threadCursor.getString(threadCursor.getColumnIndexOrThrow("thread_id"));
+                String msgCount = threadCursor.getString(threadCursor.getColumnIndexOrThrow("msg_count"));
                 String number = "";
                 String name = "";
 
@@ -90,7 +89,7 @@ public class MainActivity extends ListActivity implements
                 if (!number.equals(""))
                     name = getContactName(number);
 
-                listThreadItems.add(name + "\n\n" + smsBody);
+                listThreadItems.add(new ThreadItem(name, smsBody, msgCount));
             } while (threadCursor.moveToPrevious());
 
             threadCursor.close();
