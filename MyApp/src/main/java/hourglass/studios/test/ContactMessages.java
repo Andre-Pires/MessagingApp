@@ -21,13 +21,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Pires on 6/29/13.
  */
 public class ContactMessages extends ListActivity {
 
+    private final String SENT = "SMS_SENT";
+    private final String DELIVERED = "SMS_DELIVERED";
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM d - HH:mm");
+    //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
+    private final ArrayList<SmsItem> contactItems = new ArrayList<SmsItem>();
     private int maxListSize = 50;
     private String thread, phone = "";
     private String name = "";
@@ -35,12 +42,6 @@ public class ContactMessages extends ListActivity {
     private String smsSent = "";
     private BroadcastReceiver sentReceiver;
     private BroadcastReceiver deliveredReceiver;
-    private String SENT = "SMS_SENT";
-    private String DELIVERED = "SMS_DELIVERED";
-
-    //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    private ArrayList<SmsItem> contactItems = new ArrayList<SmsItem>();
-
     //DEFINING STRING ADAPTER WHICH WILL HANDLE DATA OF LISTVIEW
     private ArrayAdapter<SmsItem> contactItemAdapter;
 
@@ -51,19 +52,18 @@ public class ContactMessages extends ListActivity {
 
         setContentView(R.layout.contact_messages);
 
-
-        //---- recovering the thread_id from main_activity
-        Bundle extras = getIntent().getExtras();
+        //---- recovering the thread_id from Main Activity
+        final Bundle extras = getIntent().getExtras();
         if (extras != null) {
             thread = extras.getString("thread");
         }
 
-        TextView contact = (TextView) findViewById(R.id.textCont);
+        final TextView contact = (TextView) findViewById(R.id.textCont);
         smsReceived = (EditText) findViewById(R.id.textsms);
 
         registerReceivers();
 
-        ListView l = getListView();
+        final ListView l = getListView();
         l.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
         l.setStackFromBottom(true);
 
@@ -80,7 +80,9 @@ public class ContactMessages extends ListActivity {
     }
 
     private void showContactInfo(TextView contact) {
-        String[] uriSms = {"content://sms/inbox", "content://sms/sent", "content://sms/drafts", "content://sms/outbox", "content://sms/failed"};
+        final String[] uriSms = {"content://sms/inbox", "content://sms/sent", "content://sms/drafts", "content://sms/outbox", "content://sms/failed"};
+        final String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
+        final String selectedRows = ContactsContract.PhoneLookup.NUMBER + "='" + phone + "'";
 
         int counter = 0;
         while (phone.equals("")) {
@@ -88,11 +90,11 @@ public class ContactMessages extends ListActivity {
             counter++;
         }
 
-        if (!(phone.equals(""))) {
+        if (!phone.equals("")) {
 
             //contact's number
-            Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phone));
-            Cursor cs = getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + phone + "'", null, null);
+            final Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phone));
+            final Cursor cs = getContentResolver().query(uri_cont, projection, selectedRows, null, null);
 
             if (cs != null && cs.getCount() > 0) {
                 cs.moveToFirst();
@@ -101,46 +103,54 @@ public class ContactMessages extends ListActivity {
             }
 
 
-            if (!name.equals(""))
+            if (!name.equals("")) {
                 contact.setText(name + " - " + phone);
+            } else {
+                contact.setText(phone);
+            }
 
-            else contact.setText(phone);
-
-        } else
+        } else {
             contact.setText("Failed to retrieve name");
+        }
     }
 
     private void populateSmsList() {
-        String strUriCon = "content://sms/conversations/" + thread;
-        Uri uriSmsConversations = Uri.parse(strUriCon);
-        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null, "date");
+        final String strUriCon = "content://sms/conversations/" + thread;
+        final String[] projection = {"body", "address", "date", "type"};
+        final Uri uriSmsConversations = Uri.parse(strUriCon);
+        final Cursor c = getContentResolver().query(uriSmsConversations, projection, null, null, "date");
 
         if (c != null) {
 
             if (c.getCount() > maxListSize) {
-                    contactItems.add(new SmsItem("", "Press to show more entries"));
+                contactItems.add(new SmsItem("", "Press to show more entries", ""));
             }
 
+            String body;
+            String number;
+            String dateString;
+            Date date;
 
             c.moveToPosition(c.getCount() - maxListSize);
-
             while (c.moveToNext()) {
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                String number = c.getString(c.getColumnIndexOrThrow("address"));
+                body = c.getString(c.getColumnIndexOrThrow("body"));
+                number = c.getString(c.getColumnIndexOrThrow("address"));
+                dateString = c.getString(c.getColumnIndexOrThrow("date"));
+                date = new Date(Long.parseLong(dateString));
 
-                if (c.getInt(c.getColumnIndexOrThrow("type")) == 1)             // type ALL - 0,DRAFTS - 3,INBOX - 1,OUTBOX - 4, SENT - 2
-                {
+                // Type: ALL - 0,DRAFTS - 3,INBOX - 1,OUTBOX - 4, SENT - 2
+                if (c.getInt(c.getColumnIndexOrThrow("type")) == 1) {
                     if (!(name == null) && !name.equals("")) {
-                        contactItems.add(new SmsItem(name, body));
+                        contactItems.add(new SmsItem(name, body, simpleDateFormat.format(date)));
                     } else {
-                        contactItems.add(new SmsItem(number, body));
+                        contactItems.add(new SmsItem(number, body, simpleDateFormat.format(date)));
                     }
 
                 } else {
                     if (c.getInt(c.getColumnIndexOrThrow("type")) == 2) {
-                        contactItems.add(new SmsItem("Me", body));
+                        contactItems.add(new SmsItem("Me", body, simpleDateFormat.format(date)));
                     } else {
-                        contactItems.add(new SmsItem(number, body));
+                        contactItems.add(new SmsItem(number, body, simpleDateFormat.format(date)));
                     }
                 }
             }
@@ -152,9 +162,10 @@ public class ContactMessages extends ListActivity {
     }
 
     private String getPhoneNumber(String uriString, String thread) {
-        Uri uri = Uri.parse(uriString);
-        String where = "thread_id=" + thread;
-        Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
+        final Uri uri = Uri.parse(uriString);
+        final String where = "thread_id=" + thread;
+        final String[] projection = {"address"};
+        final Cursor cursorPhone = getContentResolver().query(uri, projection, where, null, null);
         String phone = "";
 
         if (cursorPhone != null && cursorPhone.moveToFirst()) {
@@ -166,10 +177,11 @@ public class ContactMessages extends ListActivity {
 
 
     private void increaseList(int step) {
-        String strUriCon = "content://sms/conversations/" + thread;
-        Uri uriSmsConversations = Uri.parse(strUriCon);
-        Cursor c = getContentResolver().query(uriSmsConversations, null, null, null, "date");
-        ArrayList<SmsItem> tempList = new ArrayList<SmsItem>();
+        final String strUriCon = "content://sms/conversations/" + thread;
+        final String[] projection = {"body", "address", "date", "type"};
+        final Uri uriSmsConversations = Uri.parse(strUriCon);
+        final Cursor c = getContentResolver().query(uriSmsConversations, projection, null, null, "date");
+        final ArrayList<SmsItem> tempList = new ArrayList<SmsItem>();
 
         int oldMaxListSize = maxListSize;
         maxListSize += step;
@@ -180,29 +192,35 @@ public class ContactMessages extends ListActivity {
             tempList.addAll(contactItems);
             contactItems.clear();
 
-            if (c.getCount() > maxListSize)
-                contactItems.add(new SmsItem("", "Press to show more entries"));
+            if (c.getCount() > maxListSize) {
+                contactItems.add(new SmsItem("", "Press to show more entries", ""));
+            }
+
+            String body;
+            String number;
+            String dateString;
+            Date date;
 
             c.moveToPosition(c.getCount() - maxListSize);
 
             while (c.moveToNext() && c.getPosition() <= c.getCount() - oldMaxListSize) {
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                String number = c.getString(c.getColumnIndexOrThrow("address"));
+                body = c.getString(c.getColumnIndexOrThrow("body"));
+                number = c.getString(c.getColumnIndexOrThrow("address"));
+                dateString = c.getString(c.getColumnIndexOrThrow("date"));
+                date = new Date(Long.parseLong(dateString));
 
                 if (c.getInt(c.getColumnIndexOrThrow("type")) == 1)    // type ALL - 0,DRAFTS - 3,INBOX - 1,OUTBOX - 4, SENT - 2
                 {
                     if (!(name == null) && !name.equals("")) {
-                        contactItems.add(new SmsItem(name, body));
+                        contactItems.add(new SmsItem(name, body, simpleDateFormat.format(date)));
                     } else {
-                        contactItems.add(new SmsItem(number, body));
+                        contactItems.add(new SmsItem(number, body, simpleDateFormat.format(date)));
                     }
 
                 } else if (c.getInt(c.getColumnIndexOrThrow("type")) == 2) {
-                    contactItems.add(new SmsItem("Me", body));
-                }
-
-                else {
-                    contactItems.add(new SmsItem(number, body));
+                    contactItems.add(new SmsItem("Me", body, simpleDateFormat.format(date)));
+                } else {
+                    contactItems.add(new SmsItem(number, body, simpleDateFormat.format(date)));
 
                 }
             }
@@ -219,10 +237,10 @@ public class ContactMessages extends ListActivity {
 
         smsSent = String.valueOf(smsReceived.getText());
 
-        if (smsSent.isEmpty())
+        if (smsSent.isEmpty()) {
             Toast.makeText(getBaseContext(), "Message field is empty.",
                     Toast.LENGTH_SHORT).show();
-        else{
+        } else {
             smsReceived.setText("");
             sendMessage();
         }
@@ -233,28 +251,29 @@ public class ContactMessages extends ListActivity {
     public void sendMessage() {
 
 
+        final SmsManager smsMan = SmsManager.getDefault();
 
-        SmsManager smsMan = SmsManager.getDefault();
-
-        PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
+        final PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
 
-        PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
+        final PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
 
 
         try {
             smsMan.sendTextMessage(phone, null, smsSent, sentSms, deliveredSms);
-            ContentValues values = new ContentValues();
+            final ContentValues values = new ContentValues();
             values.put("address", phone);
             values.put("date", System.currentTimeMillis());
             values.put("body", smsSent);
             getContentResolver().insert(Uri.parse("content://sms/sent"), values);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
 
-        contactItems.add(new SmsItem("Me", smsSent));
+        final Date date = new Date(System.currentTimeMillis());
+
+        contactItems.add(new SmsItem("Me", smsSent, simpleDateFormat.format(date)));
         contactItemAdapter.notifyDataSetChanged();
     }
 
@@ -316,7 +335,7 @@ public class ContactMessages extends ListActivity {
         super.onListItemClick(l, v, position, id);
 
         if (contactItems.get(position).getText().equals("Press to show more entries")) {
-            int focus = contactItemAdapter.getCount() - 1;
+            final int focus = contactItemAdapter.getCount() - 1;
             increaseList(50);
             l.setSelectionFromTop(maxListSize - focus, 105);
         }
@@ -325,6 +344,7 @@ public class ContactMessages extends ListActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //TODO destroy receivers only after a certain time
         if (sentReceiver != null && deliveredReceiver != null) {
             unregisterReceiver(sentReceiver);
             unregisterReceiver(deliveredReceiver);

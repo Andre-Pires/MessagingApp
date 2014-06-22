@@ -37,14 +37,14 @@ public class Message extends ListActivity implements
 
     private static final int URL_LOADER = 0;
     //Contact List
-    private ArrayList<String> contacts = new ArrayList<String>();
+    private final ArrayList<String> contacts = new ArrayList<String>();
+    private final String SENT = "SMS_SENT";
+    private final String DELIVERED = "SMS_DELIVERED";
     private EditText phoneReceived, smsReceived;
     private String phoneSent, smsSent;
     private BroadcastReceiver sentReceiver;
     private BroadcastReceiver deliveredReceiver;
     private Cursor cur;
-    private String SENT = "SMS_SENT";
-    private String DELIVERED = "SMS_DELIVERED";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,22 +66,21 @@ public class Message extends ListActivity implements
     private void initializeList() {
 
 
-        ContentResolver cr = getContentResolver();
-        //Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        final ContentResolver cr = getContentResolver();
 
 
         if (cur != null && cur.getCount() > 0) {
             while (cur.moveToNext()) {
 
-                String id = cur.getString(
+                final String id = cur.getString(
                         cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(
+                final String name = cur.getString(
                         cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
                 if (Integer.parseInt(cur.getString(
                         cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
 
-                    Cursor pCur = cr.query(
+                    final Cursor pCur = cr.query(
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                             null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
@@ -101,7 +100,7 @@ public class Message extends ListActivity implements
             cur.close();
         }
         //eliminating duplicates and sort list
-        HashSet hs = new HashSet();
+        final HashSet hs = new HashSet();
         hs.addAll(contacts);
 
         contacts.clear();
@@ -111,7 +110,7 @@ public class Message extends ListActivity implements
     }
 
     private void autoCompleteCleaner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, contacts);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, contacts);
         final AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.textphone);
         textView.setAdapter(adapter);
 
@@ -177,14 +176,15 @@ public class Message extends ListActivity implements
 
         smsSent = String.valueOf(smsReceived.getText());
 
-        if (phoneSent.isEmpty())
+        if (phoneSent.isEmpty()) {
             Toast.makeText(getBaseContext(), "Please choose a valid number.",
                     Toast.LENGTH_SHORT).show();
-        else if (smsSent.isEmpty())
+        } else if (smsSent.isEmpty()) {
             Toast.makeText(getBaseContext(), "Message field is empty.",
                     Toast.LENGTH_SHORT).show();
-        else
+        } else {
             sendMessage();
+        }
     }
 
 
@@ -243,23 +243,23 @@ public class Message extends ListActivity implements
 
     private void sendMessage() {
 
-        SmsManager smsMan = SmsManager.getDefault();
+        final SmsManager smsMan = SmsManager.getDefault();
 
-        PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
+        final PendingIntent sentSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
 
-        PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
+        final PendingIntent deliveredSms = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
 
         try {
             smsMan.sendTextMessage(phoneSent, null, smsSent, sentSms, deliveredSms);
-            ContentValues values = new ContentValues();
+            final ContentValues values = new ContentValues();
             values.put("address", phoneSent);
             values.put("date", System.currentTimeMillis());
             values.put("body", smsSent);
             getContentResolver().insert(Uri.parse("content://sms/sent"), values);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
 
         finish();
@@ -276,10 +276,9 @@ public class Message extends ListActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
-    /*
-     * Takes action based on the ID of the Loader that's being created
-     */
-
+       /*
+        *   Takes action based on the ID of the Loader that's being created
+        */
         switch (loaderID) {
             case URL_LOADER:
                 // Returns a new CursorLoader

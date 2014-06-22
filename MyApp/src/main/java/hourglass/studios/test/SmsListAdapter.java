@@ -15,40 +15,26 @@ import java.util.List;
  */
 public class SmsListAdapter extends ArrayAdapter<SmsItem> {
     private final LayoutInflater inflater;
-    private List<SmsItem> smsItems = new ArrayList<SmsItem>();
     private final int rightViewType = 1;
     private final int leftViewType = 2;
     private final int showMoreType = 0;
-    private final int viewCount = 3;;
-
-    private static class LeftViewHolder {
-        private TextView name;
-        private TextView text;
-    }
-
-    private static class RightViewHolder {
-        private TextView name;
-        private TextView text;
-    }
-
-    private static class ShowViewHolder {
-        private TextView showMoreText;
-    }
+    private final int viewCount = 3;
+    private List<SmsItem> smsItems = new ArrayList<SmsItem>();
 
     public SmsListAdapter(Context context, int resource, List<SmsItem> objects) {
         super(context, resource, objects);
-        this.inflater = (LayoutInflater)context.getSystemService
+        this.inflater = (LayoutInflater) context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
         this.smsItems = objects;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        int viewType = this.getItemViewType(position);
+        final int viewType = this.getItemViewType(position);
 
-        switch(viewType) {
+        switch (viewType) {
             case rightViewType: {
-                RightViewHolder rightHolder;
+                final RightViewHolder rightHolder;
 
                 View view = convertView;
                 if (view == null) {
@@ -57,25 +43,27 @@ public class SmsListAdapter extends ArrayAdapter<SmsItem> {
                     rightHolder = new RightViewHolder();
                     rightHolder.name = (TextView) view.findViewById(R.id.rightName);
                     rightHolder.text = (TextView) view.findViewById(R.id.rightText);
+                    rightHolder.date = (TextView) view.findViewById(R.id.rightDate);
                     view.setTag(rightHolder);
                 } else {
 
                     rightHolder = (RightViewHolder) view.getTag();
                 }
 
-                SmsItem item = smsItems.get(position);
+                final SmsItem item = smsItems.get(position);
 
                 if (item != null) {
                     if (rightHolder.text != null && rightHolder.name != null) {
                         rightHolder.name.setText(item.getName());
                         rightHolder.text.setText(item.getText());
+                        rightHolder.date.setText(item.getDate());
                     }
                 }
                 return view;
             }
 
             case leftViewType: {
-                LeftViewHolder leftHolder;
+                final LeftViewHolder leftHolder;
 
                 View view = convertView;
                 if (view == null) {
@@ -84,23 +72,25 @@ public class SmsListAdapter extends ArrayAdapter<SmsItem> {
                     leftHolder = new LeftViewHolder();
                     leftHolder.name = (TextView) view.findViewById(R.id.leftName);
                     leftHolder.text = (TextView) view.findViewById(R.id.leftText);
+                    leftHolder.date = (TextView) view.findViewById(R.id.leftDate);
                     view.setTag(leftHolder);
                 } else {
                     leftHolder = (LeftViewHolder) view.getTag();
                 }
 
-                SmsItem item = smsItems.get(position);
+                final SmsItem item = smsItems.get(position);
 
                 if (item != null) {
                     if (leftHolder.text != null && leftHolder.name != null) {
                         leftHolder.name.setText(item.getName());
                         leftHolder.text.setText(item.getText());
+                        leftHolder.date.setText(item.getDate());
                     }
                 }
                 return view;
             }
             case showMoreType: {
-                ShowViewHolder holder;
+                final ShowViewHolder holder;
 
                 View view = convertView;
                 if (view == null) {
@@ -113,7 +103,7 @@ public class SmsListAdapter extends ArrayAdapter<SmsItem> {
                     holder = (ShowViewHolder) view.getTag();
                 }
 
-                SmsItem item = smsItems.get(position);
+                final SmsItem item = smsItems.get(position);
 
                 if (item != null) {
                     if (holder.showMoreText != null) {
@@ -140,11 +130,27 @@ public class SmsListAdapter extends ArrayAdapter<SmsItem> {
 
         if (name.equals("Me")) {
             return rightViewType;
-        } else if(!name.equals("")){
+        } else if (!name.equals("")) {
             return leftViewType;
         } else {
             return showMoreType;
         }
+    }
+
+    private static class LeftViewHolder {
+        private TextView name;
+        private TextView text;
+        private TextView date;
+    }
+
+    private static class RightViewHolder {
+        private TextView name;
+        private TextView text;
+        private TextView date;
+    }
+
+    private static class ShowViewHolder {
+        private TextView showMoreText;
     }
 }
 

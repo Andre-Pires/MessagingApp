@@ -47,18 +47,20 @@ public class MyCursorAdapter extends CursorAdapter {
         }
 
         // arranjar para suportar varios numeros
-        if (!number.equals(""))
+        if (!number.equals("")) {
             name = getContactName(number, context);
+        }
 
-        TextView contactName = (TextView)view.findViewById(R.id.leftName);
+        TextView contactName = (TextView) view.findViewById(R.id.leftName);
         contactName.setText(name);
 
         String tempString = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-        TextView smsBody = (TextView)view.findViewById(R.id.leftText);
-        if (tempString != null && tempString.length() > 100)
+        TextView smsBody = (TextView) view.findViewById(R.id.leftText);
+        if (tempString != null && tempString.length() > 100) {
             smsBody.setText(tempString.substring(0, Math.min(tempString.length(), 100)) + " ...");
-        else if (tempString != null)
+        } else if (tempString != null) {
             smsBody.setText(tempString);
+        }
 
 
     }
@@ -86,10 +88,12 @@ public class MyCursorAdapter extends CursorAdapter {
             if (cs != null && cs.moveToFirst()) {
                 name = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                 cs.close();
-            } else
+            } else {
                 name = number;
-        } else
+            }
+        } else {
             name = number;
+        }
         return name;
     }
 

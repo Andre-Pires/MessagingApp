@@ -11,7 +11,7 @@ import android.widget.ListView;
  */
 public class Settings extends ListActivity {
 
-    String stuff[] = {"DisplayText", "cenas2", "cenas3", "cenas4", "cenas5", "cenas6", "cenas7", "cenas8", "cenas9", "cenas10", "cenas11", "cenas12", "cenas13", "cenas14", "cenas15"};
+    String stuff[] = {"Under construction"};
 
     @Override
     protected void onCreate(Bundle sets) {
@@ -22,10 +22,6 @@ public class Settings extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
-        if (position == 0) {
-
-        }
     }
 
     @Override

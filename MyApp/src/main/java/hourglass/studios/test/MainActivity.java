@@ -2,7 +2,6 @@ package hourglass.studios.test;
 
 import android.app.ListActivity;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -13,33 +12,28 @@ import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import static hourglass.studios.test.R.layout.activity_main;
 
+/**
+ * Created by A. Pires.
+ */
 public class MainActivity extends ListActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>{
-
-    private Class textMessage, contactMessages;
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int URL_LOADER = 0;
-
-
-    //List of array strings which will serve as list items
-    private ArrayList<ThreadItem> listThreadItems = new ArrayList<ThreadItem>();
-
-    //Defining string adapter which will handle data of listview
-    private ArrayAdapter<ThreadItem> threadAdapter;
-
-    private Cursor threadCursor;
-
     //Keeps track of list items' thread number, to pass to contact's messages
-    private ArrayList<String> listThreadNumb = new ArrayList<String>();
+    private final ArrayList<String> listThreadNumb = new ArrayList<String>();
+    //List of array ThreadItems which will serve as list items
+    private final ArrayList<ThreadItem> listThreadItems = new ArrayList<ThreadItem>();
+    private Class textMessage, contactMessages;
+    private Cursor threadCursor;
+    //Defining ThreadItem adapter which will handle data of listview
+    private ArrayAdapter<ThreadItem> threadAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +50,7 @@ public class MainActivity extends ListActivity implements
 
     private void createConversations() {
 
-        String[] uriSms = new String[]{
+        final String[] uriSms = new String[]{
                 "content://sms/inbox",
                 "content://sms/sent",
                 "content://sms/drafts",
@@ -70,13 +64,20 @@ public class MainActivity extends ListActivity implements
 
 
         if (threadCursor != null && threadCursor.getCount() > 0) {
+
+            String smsBody;
+            String thread;
+            String msgCount;
+            String number;
+            String name;
+
             threadCursor.moveToLast();
             do {
-                String smsBody = threadCursor.getString(threadCursor.getColumnIndexOrThrow("snippet"));
-                String thread = threadCursor.getString(threadCursor.getColumnIndexOrThrow("thread_id"));
-                String msgCount = threadCursor.getString(threadCursor.getColumnIndexOrThrow("msg_count"));
-                String number = "";
-                String name = "";
+                smsBody = threadCursor.getString(threadCursor.getColumnIndexOrThrow("snippet"));
+                thread = threadCursor.getString(threadCursor.getColumnIndexOrThrow("thread_id"));
+                msgCount = threadCursor.getString(threadCursor.getColumnIndexOrThrow("msg_count"));
+                number = "";
+                name = "";
 
                 listThreadNumb.add(thread);
 
@@ -86,8 +87,9 @@ public class MainActivity extends ListActivity implements
                     counter++;
                 }
                 // arranjar para suportar varios numeros
-                if (!number.equals(""))
+                if (!number.equals("")) {
                     name = getContactName(number);
+                }
 
                 listThreadItems.add(new ThreadItem(name, smsBody, msgCount));
             } while (threadCursor.moveToPrevious());
@@ -99,26 +101,33 @@ public class MainActivity extends ListActivity implements
     }
 
     private String getContactName(String number) {
-        String name;
-        Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+        final String name;
+        final Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+        final String contactName = ContactsContract.PhoneLookup.DISPLAY_NAME;
+        final String[] projection = {contactName};
+        final String selectedRows = ContactsContract.PhoneLookup.NUMBER + "='" + number + "'";
 
         if (uri_cont != null) {
-            Cursor cs = getContentResolver().query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + number + "'", null, null);
+            final Cursor cs = getContentResolver().query(uri_cont, projection, selectedRows, null, null);
 
             if (cs != null && cs.moveToFirst()) {
-                name = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                name = cs.getString(cs.getColumnIndex(contactName));
                 cs.close();
-            } else
+            } else {
                 name = number;
-        } else
+            }
+        } else {
             name = number;
+        }
+
         return name;
     }
 
     private String getPhoneNumber(String uriString, String thread) {
-        Uri uri = Uri.parse(uriString);
-        String where = "thread_id=" + thread;
-        Cursor cursorPhone = getContentResolver().query(uri, null, where, null, null);
+        final Uri uri = Uri.parse(uriString);
+        final String where = "thread_id=" + thread;
+        final String[] projection = {"address"};
+        final Cursor cursorPhone = getContentResolver().query(uri, projection, where, null, null);
         String phone = "";
 
         if (cursorPhone != null && cursorPhone.moveToFirst()) {
@@ -129,21 +138,6 @@ public class MainActivity extends ListActivity implements
     }
 
 
-    public void buttonSmsOnClick(View v) {
-
-
-        try {
-            textMessage = Class.forName("hourglass.studios.test.Message");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        Intent sms = new Intent(MainActivity.this, textMessage);
-        startActivity(sms);
-
-
-    }
-
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -151,10 +145,10 @@ public class MainActivity extends ListActivity implements
         try {
             contactMessages = Class.forName("hourglass.studios.test.ContactMessages");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
 
-        Intent contactSms = new Intent(this, contactMessages);
+        final Intent contactSms = new Intent(this, contactMessages);
         contactSms.putExtra("thread", listThreadNumb.get(position));
         startActivity(contactSms);
 
@@ -172,8 +166,20 @@ public class MainActivity extends ListActivity implements
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent startSettings = new Intent("hourglass.studios.test.SETTINGS");
+                final Intent startSettings = new Intent("hourglass.studios.test.SETTINGS");
                 startActivity(startSettings);
+                break;
+            case R.id.action_compose:
+                try {
+                    textMessage = Class.forName("hourglass.studios.test.Message");
+                } catch (ClassNotFoundException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                final Intent sms = new Intent(MainActivity.this, textMessage);
+                startActivity(sms);
+                break;
+
         }
 
         return true;
@@ -188,14 +194,14 @@ public class MainActivity extends ListActivity implements
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle)
-    {
+    public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
     /*
      * Takes action based on the ID of the Loader that's being created
      */
 
-        String strUriCon = "content://sms/conversations";
-        Uri uriSmsThreads = Uri.parse(strUriCon);
+        final String strUriCon = "content://sms/conversations";
+        final Uri uriSmsThreads = Uri.parse(strUriCon);
+        final String[] projection = {"snippet", "thread_id", "msg_count"};
 
         switch (loaderID) {
             case URL_LOADER:
@@ -203,7 +209,7 @@ public class MainActivity extends ListActivity implements
                 return new CursorLoader(
                         getBaseContext(),   // Parent activity context
                         uriSmsThreads,        // Table to query
-                        null,     // Projection to return
+                        projection,     // Projection to return
                         null,            // No selection clause
                         null,            // No selection arguments
                         "date"             // Default sort order

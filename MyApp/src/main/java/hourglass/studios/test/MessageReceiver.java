@@ -23,15 +23,15 @@ public class MessageReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Bundle bundle = intent.getExtras();
         String sms = "", phone = "";
-        SmsMessage[] messages;
+        final Bundle bundle = intent.getExtras();
+        final SmsMessage[] messages;
         contentResolver = context.getContentResolver();
         ContentValues values;
 
         if (bundle != null) {
 
-            Object[] pdus = (Object[]) bundle.get("pdus");
+            final Object[] pdus = (Object[]) bundle.get("pdus");
             messages = new SmsMessage[pdus.length];
             for (int i = 0; i < messages.length; i++) {
                 messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
@@ -50,19 +50,21 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     private String getContactName(String number) {
-        String name;
-        Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+        final String name;
+        final Uri uri_cont = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 
         if (uri_cont != null) {
-            Cursor cs = contentResolver.query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + number + "'", null, null);
+            final Cursor cs = contentResolver.query(uri_cont, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, ContactsContract.PhoneLookup.NUMBER + "='" + number + "'", null, null);
 
             if (cs != null && cs.moveToFirst()) {
                 name = cs.getString(cs.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                 cs.close();
-            } else
+            } else {
                 name = number;
-        } else
+            }
+        } else {
             name = number;
+        }
         return name;
     }
 }
